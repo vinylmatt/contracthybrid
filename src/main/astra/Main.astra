@@ -1,0 +1,45 @@
+agent Main {
+	module Console c;
+	module System s;
+	module EIS ei;
+	module Debug d;
+	module Prelude p;
+    module Math math;
+
+	rule +!main(list args) {
+		ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
+		ei.init([generation("no"), level("2")]);
+		ei.join();
+		ei.startEnv();
+		
+		
+		list robots = ei.freeEntities();
+
+		s.sleep(2000);
+/*Manager comes to work first*/
+		int i = 0;
+				s.createAgent(p.valueAsString(robots, i), "VacManager");
+				s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, i)]);
+				c.println(p.valueAsString(robots, i));
+		i = i + 1;
+
+/*Loop the other Vacs*/
+
+          while (i < p.size(robots)) {
+              	c.println(p.valueAsString(robots, i));
+				s.createAgent(p.valueAsString(robots, i), "VacCleaner");
+				s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, i)]);
+              	i = i + 1;
+          }
+
+
+		while(true) {
+			/*c.println("I am main loop, I keep looping every 5");*/
+			s.sleep(5000);
+		}
+
+   
+
+    
+	}
+}
