@@ -34,7 +34,7 @@ agent Main {
 
 
 		while(true) {
-			/*c.println("I am main loop, I keep looping every 5");*/
+			/*c.println("I am main loop, I keep looping every 5sec");*/
 			s.sleep(5000);
 		}
 
