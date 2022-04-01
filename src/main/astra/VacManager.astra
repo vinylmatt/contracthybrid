@@ -12,7 +12,6 @@ agent VacManager extends FIPACNInitiator {
 		formula free(string);
 		formula manager(string);
 
-
 	 }
 
      
@@ -29,15 +28,11 @@ agent VacManager extends FIPACNInitiator {
         s.sleep(10000);
 
         forall(string arg : args) {
-            c.println("+participant(" + arg + ") / Args: " + args);
+            c.println("+participant(" + arg + " . ");
             +participant(arg);
         }
 
 
-
-
-
-        c.println("+contract etc etc");
         +contract("1", "test", [], 1000);
     }
 
@@ -356,9 +351,9 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ~fr
     }
 
     rule +!decide()  {
-		c.println(".3.3.1 DECIDED TO BACKUP.");
+		//c.println(".3.3.1 DECIDED TO BACKUP.");
         !move("back");
-		c.println(".3.3.2 DECIDED TO BACKUP.");
+		//c.println(".3.3.2 DECIDED TO BACKUP.");
 		s.sleep(10);
 		
     }
@@ -380,7 +375,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
-		c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Backup beep beep beep");
+		//c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Backup beep beep beep");
 		/*d.dumpBeliefs();
 		ei.dumpState();*/
 		ei.light("off");s.sleep(50);ei.light("on");s.sleep(50);ei.light("off");s.sleep(50);	ei.light("on");s.sleep(50);ei.light("off");

@@ -6,6 +6,7 @@ agent FIPACNParticipant extends FIPAContractNet {
 
     // COMMUNUCATION RULES
     rule @message(cfp, string sender, contract(string id, string type, list params, int deadline)) {
+        
         +contract(id, type, params, deadline);
 
         try {

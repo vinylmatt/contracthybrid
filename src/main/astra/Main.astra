@@ -29,7 +29,8 @@ agent Main {
 			  	s.sleep(1000);
 				s.createAgent(p.valueAsString(robots, i), "VacCleaner");
 				s.sleep(100);
-				s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, 0)]);
+				s.setMainGoal(p.valueAsString(robots, i), [robots]);
+				/*s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, 0)]);*/
               	i = i + 1;
           }
 
