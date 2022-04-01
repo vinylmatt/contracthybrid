@@ -1,5 +1,5 @@
 /*Cleared the grid once on level 3*/
-agent VacCleaner extends FIPACNParticipant {
+agent VacCleaner extends FIPAContractNet {
     module Console c;
 	module Math math;
     module System s;
@@ -10,7 +10,10 @@ agent VacCleaner extends FIPACNParticipant {
         formula vac(string);
 		formula move(string, int );
 		formula location_status(long, long, string);
+		formula manager(string);
 		formula free(string);
+		formula accepted(string /* contract_id*/, string /*awarder*/);
+        formula rejected(string /* contract_id*/, string /*awarder*/);
 
 	 }
 
@@ -18,13 +21,15 @@ agent VacCleaner extends FIPACNParticipant {
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac");
 	
 	rule +!main([string name]) {
-        c.println("Sullen Worker name is: " + name);
+		c.println("Sullen worker is: " + s.name());
+        c.println("and is reporting to: " + name);
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
+		+manager(name);
         ei.join();
-        ei.link(name);
+        ei.link(s.name());
     }
 
-   rule +!generate_bid(string id, int value) : contract(id, "test", [], int deadline) {
+   rule +!generate_bid(string id, int value) : contract(id, "test", [], int deadline)  {
         c.println("Rule generate bid id " +id+ " the deadline " + deadline +" coming into the fn ");
         value = 1+(math.randomInt() % 20);
         c.println(" bid id " +id+ " value " +value+ " now after the fn ");
@@ -443,7 +448,48 @@ rule +!clean(string name)
 
     }*/
 
+ // COMMUNUCATION RULES
+    rule @message(cfp, string sender, contract(string id, string type, list params, int deadline)) : manager(string VacManager) {
+        +contract(id, type, params, deadline);
 
+        try {
+            !bid(id, string name, int value);
+
+            send(propose, VacManager, bid(id, name, value));
+        } recover {
+            send(refuse, VacManager, contract(id, type, params, deadline));
+        }
+    }
+
+    rule @message(accept-proposal, string sender, bid(string id, system.name(), int value)) : contract(id, string type, list params, int deadline) & manager(string VacManager) {
+        +accepted(id, sender);
+        try {
+            !fulfil(id, type, params);
+            send(inform, VacManager, fulfilled(id, type, params));
+        } recover {
+            send(failure, VacManager, contract(id, type, params, deadline));
+        }
+    }
+
+    rule @message(reject-proposal, string sender, bid(string id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
+        +rejected(id, sender);
+    }
+
+    rule +!bid(string id, string name, int value) {
+        !generate_bid(id, int my_value);
+        
+        name = system.name();
+        value = my_value;
+        +bid(id, name, value);
+    }
+    
+    rule +!generate_bid(string id, int value) : contract(id, string type, list params, int deadline) {
+        system.fail();
+    }
+
+    rule +!fulfil(string id, string type, list params) {
+        system.fail();
+    }
 
 }
 
