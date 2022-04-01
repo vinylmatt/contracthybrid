@@ -11,7 +11,7 @@ agent VacManager extends FIPAContractNet {
 		formula move(string, int );
 		formula location_status(long, long, string);
 		formula free(string);
-
+		formula manager(string);
 		formula participant(string);
         formula awarded(string, string);
         formula best_bid(string, string, int);
@@ -23,10 +23,13 @@ agent VacManager extends FIPAContractNet {
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac");
 
 	rule +!main([string name]) {
-        c.println("Enthusiastic Capitalist is: " + name);
+        c.println("Enthusiastic Capitalist is: " + s.name());
+		c.println("and is reporting to themselves, " + name);
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
+        +manager(name);
         ei.join();
-        ei.link(name);
+        ei.link(s.name());
+
 		
     }
 
@@ -479,10 +482,6 @@ rule +location_status(long X, long Y, string contents )
 }
 
 
-rule +completed("1", true) {
-        c.println("completed 1 is true make contract 2?");
-        +contract("2", "test", [], 2000);
-    }
     
 rule +!completed(string id, boolean outcome) {
         c.println("Contact: " + id + " / Outcome: " + outcome);
