@@ -15,17 +15,20 @@ agent Main {
 		
 		list robots = ei.freeEntities();
 
-		s.sleep(2000);
+		s.sleep(200);
 /*Manager comes to work first*/
 		int i = 0;
 				s.createAgent(p.valueAsString(robots, i), "VacManager");
-				s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, i)]);
+				s.sleep(100);
+				s.setMainGoal(p.valueAsString(robots, i), [robots]);
 		i = i + 1;
 
 /*Loop the other Vacs*/
 
           while (i < p.size(robots)) {
+			  	s.sleep(1000);
 				s.createAgent(p.valueAsString(robots, i), "VacCleaner");
+				s.sleep(100);
 				s.setMainGoal(p.valueAsString(robots, i), [p.valueAsString(robots, 0)]);
               	i = i + 1;
           }
