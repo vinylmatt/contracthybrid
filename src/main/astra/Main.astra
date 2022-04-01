@@ -20,7 +20,8 @@ agent Main {
 		int i = 0;
 				s.createAgent(p.valueAsString(robots, i), "VacManager");
 				s.sleep(100);
-				s.setMainGoal(p.valueAsString(robots, i), [robots]);
+				s.setMainGoal(p.valueAsString(robots, i), robots);
+				//prelude.removeHead (or something like that)
 		i = i + 1;
 
 /*Loop the other Vacs*/
