@@ -32,11 +32,11 @@ agent VacManager extends FIPACNInitiator {
         }
 		s.sleep(3000);
         /*+contract("1", "test", [], 1000);*/
-		!makecontract();
+		/*!makecontract();
 		s.sleep(3000);
 		!makecontract();
 		s.sleep(9000);
-		!makecontract();
+		!makecontract();*/
     }
 
 	rule +completed(int ID, true) {
@@ -88,12 +88,12 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 
 /*signalling*/
 
-rule +!makecontract() : messagetick(int tick) {
+rule +!makecontract(int X, int Y) : messagetick(int tick) {
 		int n = 1; 
 		n = tick + n;
-		c.println("messagetick(tick "+n+"  ");
+		c.println("Sending message number "+n+"  ");
 		-+messagetick(n);
-		+contract(n, "test", [], 1000); //prelude to string here
+		+contract(n, "test", [], 1000); 
     }
 
 
@@ -494,14 +494,15 @@ rule +$ei.event(square(string name, string contents))  :  ei.direction("west") &
 
 
 
-/* send locations of dust to contracts
+/* send locations of dust to contracts*/
 rule +location_status(long X, long Y, string contents ) 
 {
 	      
 			c.println("DUST LOGGED x = "+ X +" y= "+ Y +".  ");
-			+contract("1", "test", [X,Y], 1000);
+			!makecontract(X,Y);
+			
 
-}*/
+}
 
 
 

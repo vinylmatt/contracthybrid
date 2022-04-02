@@ -9,6 +9,7 @@ agent VacCleaner extends FIPACNParticipant {
         formula vac(string);
 		formula move(string, int );
 		formula location_status(long, long, string);
+		formula mylocation(int, int, string); 
 		formula manager(string);
 		formula free(string);
 
@@ -25,16 +26,37 @@ agent VacCleaner extends FIPACNParticipant {
         ei.join();
         ei.link(s.name());
     }
-
-    rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) {
-        c.println("Rule generate bid id " +id+ " the deadline " + deadline +" coming into the fn ");
-        value = 1+(math.randomInt() % 20);
+/*I want to make a bid and have postion!*/
+    rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & mylocation(int myA, int myB,string d) & ei.location(long A, long B) {
+        c.println("I know position so I can generate bid for id " +id+ " the deadline " + deadline +" . ");
+		/*int value2 = myA + myB;*/
+		/*value = 1+(math.randomInt() % 20)+value2;*/
+		/*c.println("My bid for " +id+ " should be " +value2+ " which is an int  . ");*/
+		value = myA + myB;
 		//read the bid figure the distance
-        c.println(" bid id " +id+ " value " +value+ " now after the fn ");
+        c.println(" I bid for id " +id+ " with value " +value+ " another int that ASTRA likes at myA " +myA+ ". myB " +myB+ " and ei location A " +myA+ " B" +myB+ "");
+
     }
 
+/*I want to make a bid but no postion!*/
+    rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & ei.location(long A, long B) & ei.direction(string d) {
+        c.println("update position to answer bid id " +id+ " the deadline " + deadline +" . ");
+		long myA = A;
+		long myB = B;
+		//find my location
+		!mylocation(myA,myB,d);
+	
+    }
+
+rule +!mylocation(int myA, int myB, string d)  
+	{
+		c.println("Update local position belief A coordinates " +myA+ "B coordinates " +myB+ " facing" +d+ "");
+		-+mylocation(myA,myB,d);
+		/*d.dumpBeliefs();*/
+	}
+
     rule +!fulfil(int id, "test", []) {
-        c.println("I got a fulfilling the contract message...");
+        c.println("I got a fulfilling the contract message for ID " +id+ "...");
     }
 
 
@@ -45,11 +67,22 @@ agent VacCleaner extends FIPACNParticipant {
 	
     }
 
-rule +$ei.event(task("move")) 
+rule +$ei.event(task("move"))
     {
-      /*  //c.println("DEBUG ONLY move operation result DO NOTHING");
-		//c.println("DEBUG ONLY move operation result DO NOTHING");*/
+       // c.println(" DEBUG ONLY move operation result make update ");
+
+		//c.println("DEBUG ONLY move operation update completed");
     }	
+
+/*rule +$ei.event(task("none")) : ei.location(long A, long B) & ei.direction(string d) 
+    {
+        c.println(" move operation result make update ");
+		long myA = A;
+		long myB = B;
+	  !mylocation(myA,myB,d);
+		c.println("move operation update completed");
+    }	*/
+
 
 rule +$ei.event(task("turn")) 
     {
