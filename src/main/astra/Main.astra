@@ -27,7 +27,7 @@ agent Main {
 /*Loop the other Vacs*/
 
           while (i < p.size(robots)) {
-			  	s.sleep(1000);
+			  	s.sleep(100);
 				s.createAgent(p.valueAsString(robots, i), "VacCleaner");
 				s.sleep(100);
 				s.setMainGoal(p.valueAsString(robots, i), [robots]);

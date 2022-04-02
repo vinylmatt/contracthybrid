@@ -25,10 +25,10 @@ agent VacManager extends FIPACNInitiator {
         ei.join();
         ei.link(s.name());
 
-        s.sleep(10000);
+        s.sleep(200);
 
         forall(string arg : args) {
-            c.println("+participant(" + arg + " . ");
+            c.println("Add Participant in Manager." + arg + " . ");
             +participant(arg);
         }
 
