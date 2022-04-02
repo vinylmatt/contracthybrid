@@ -34,12 +34,17 @@ agent VacManager extends FIPACNInitiator {
         /*+contract("1", "test", [], 1000);*/
 		!makecontract();
 		s.sleep(3000);
+		!makecontract();
+		s.sleep(9000);
+		!makecontract();
     }
 
-    rule +completed("1", true) {
-        c.println("completed 1 is true make contract 2?....");
-        +contract("2", "test", [], 2000);
+	rule +completed(string ID, true) {
+        c.println("completed"+ID+" is true make contract 2?....");
+        +contract(ID, "test", [], 2000);
     }
+    
+
     
     rule +!completed(string id, boolean outcome) {
         c.println("Contact: " + id + " / Outcome: " + outcome);
@@ -85,8 +90,9 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 
 rule +!makecontract() : messagetick(int tick) {
 		int n = 1; 
-		c.println("messagetick(tick "+tick+"  ");
-		-+messagetick(tick);
+		n = tick + n;
+		c.println("messagetick(tick "+n+"  ");
+		-+messagetick(n);
 		+contract("1", "test", [], 1000); //prelude to string here
     }
 
