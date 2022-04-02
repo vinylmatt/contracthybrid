@@ -29,22 +29,19 @@ agent VacCleaner extends FIPACNParticipant {
 /*I want to make a bid and have postion!*/
     rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & mylocation(int myA, int myB,string d) & ei.location(long A, long B) {
         c.println("I know position so I can generate bid for id " +id+ " the deadline " + deadline +" . ");
-		/*int value2 = myA + myB;*/
-		/*value = 1+(math.randomInt() % 20)+value2;*/
-		/*c.println("My bid for " +id+ " should be " +value2+ " which is an int  . ");*/
 		value = myA + myB;
-		//read the bid figure the distance
-        c.println(" I bid for id " +id+ " with value " +value+ " another int that ASTRA likes at myA " +myA+ ". myB " +myB+ " and ei location A " +myA+ " B" +myB+ "");
-
+		//this returns but nothing below does, ask why.
+    
     }
 
 /*I want to make a bid but no postion!*/
     rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & ei.location(long A, long B) & ei.direction(string d) {
-        c.println("update position to answer bid id " +id+ " the deadline " + deadline +" . ");
+        c.println("I didn't know where I was so I need to update position to do better that I did on bid id " +id+ " with  deadline " + deadline +" . ");
 		long myA = A;
 		long myB = B;
 		//find my location
 		!mylocation(myA,myB,d);
+		//so I need separate call to cast, or could I make one
 	
     }
 
