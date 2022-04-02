@@ -8,15 +8,15 @@ agent VacManager extends FIPACNInitiator {
  types vac_ontology {
         formula vac(string);
 		formula move(string, int );
+		formula messagetick(int);
+		formula makecontract();
 		formula location_status(long, long, string);
 		formula free(string);
 		formula manager(string);
-
 	 }
-
      
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac");
-
+	initial messagetick(0);
 
     rule +!main(list args) {
 
@@ -24,16 +24,16 @@ agent VacManager extends FIPACNInitiator {
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
         ei.join();
         ei.link(s.name());
-
         s.sleep(200);
 
         forall(string arg : args) {
             c.println("Add Participant in Manager." + arg + " . ");
             +participant(arg);
         }
-
-
-        +contract("1", "test", [], 1000);
+		s.sleep(3000);
+        /*+contract("1", "test", [], 1000);*/
+		!makecontract();
+		s.sleep(3000);
     }
 
     rule +completed("1", true) {
@@ -46,16 +46,10 @@ agent VacManager extends FIPACNInitiator {
         FIPACNInitiator::!completed(id, outcome);
     }
 
-
-
-
-
 rule +$ei.event(task("none")) 
     {
        /* c.println("DEBUG ONLY DECIDE TASK where TASK NONEDO NOTHING ");
-
 		c.println("DEBUG ONLY DECIDED TASK COMPLETE DO NOTHING");*/
-	
     }
 
 rule +$ei.event(task("move")) 
@@ -67,7 +61,6 @@ rule +$ei.event(task("move"))
 rule +$ei.event(task("turn")) 
     {
         /*c.println("DEBUG ONLY TURN operation result DO NOTHING");
-		
 		/*c.println("DEBUG ONLY TURN operation result DO NOTHING");*/
     }	
 
@@ -85,8 +78,18 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 		!decide();
 		s.sleep(10);
 		/*c.println("1.2 LOCATION DECISION COMPLETE Event at x="+ A +". y= "+ B +" direction is "+ direction +" on task: "+ task +" DECIDED AND completed. ");*/
-
     }
+
+
+/*signalling*/
+
+rule +!makecontract() : messagetick(int tick) {
+		int n = 1; 
+		c.println("messagetick(tick "+tick+"  ");
+		-+messagetick(tick);
+		+contract("1", "test", [], 1000); //prelude to string here
+    }
+
 
 /*here is dust rules*/
 
