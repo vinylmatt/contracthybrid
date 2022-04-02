@@ -1,11 +1,11 @@
 agent FIPACNParticipant extends FIPAContractNet {
     types cnp_participant {
-        formula accepted(string /* contract_id*/, string /*awarder*/);
-        formula rejected(string /* contract_id*/, string /*awarder*/);
+        formula accepted(int /* contract_id*/, string /*awarder*/);
+        formula rejected(int /* contract_id*/, string /*awarder*/);
     }
 
     // COMMUNUCATION RULES
-    rule @message(cfp, string sender, contract(string id, string type, list params, int deadline)) {
+    rule @message(cfp, string sender, contract(int id, string type, list params, int deadline)) {
         
         +contract(id, type, params, deadline);
 
@@ -18,7 +18,7 @@ agent FIPACNParticipant extends FIPAContractNet {
         }
     }
 
-    rule @message(accept-proposal, string sender, bid(string id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
+    rule @message(accept-proposal, string sender, bid(int id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
         +accepted(id, sender);
         try {
             !fulfil(id, type, params);
@@ -28,11 +28,11 @@ agent FIPACNParticipant extends FIPAContractNet {
         }
     }
 
-    rule @message(reject-proposal, string sender, bid(string id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
+    rule @message(reject-proposal, string sender, bid(int id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
         +rejected(id, sender);
     }
 
-    rule +!bid(string id, string name, int value) {
+    rule +!bid(int id, string name, int value) {
         !generate_bid(id, int my_value);
         
         name = system.name();
@@ -40,11 +40,11 @@ agent FIPACNParticipant extends FIPAContractNet {
         +bid(id, name, value);
     }
     
-    rule +!generate_bid(string id, int value) : contract(id, string type, list params, int deadline) {
+    rule +!generate_bid(int id, int value) : contract(id, string type, list params, int deadline) {
         system.fail();
     }
 
-    rule +!fulfil(string id, string type, list params) {
+    rule +!fulfil(int id, string type, list params) {
         system.fail();
     }
 }

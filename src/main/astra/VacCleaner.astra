@@ -26,14 +26,14 @@ agent VacCleaner extends FIPACNParticipant {
         ei.link(s.name());
     }
 
-    rule +!generate_bid(string id, int value) : contract(id, "test", [], int deadline) {
+    rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) {
         c.println("Rule generate bid id " +id+ " the deadline " + deadline +" coming into the fn ");
         value = 1+(math.randomInt() % 20);
 		//read the bid figure the distance
         c.println(" bid id " +id+ " value " +value+ " now after the fn ");
     }
 
-    rule +!fulfil(string id, "test", []) {
+    rule +!fulfil(int id, "test", []) {
         c.println("I got a fulfilling the contract message...");
     }
 
