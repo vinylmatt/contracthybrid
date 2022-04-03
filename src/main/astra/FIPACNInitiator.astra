@@ -44,7 +44,7 @@ agent FIPACNInitiator extends FIPAContractNet {
 
         // Return name of winner...
         +awarded(id, best_bidder);
-        c.println("...............................................CONTRACT AWARDED TO ID "+id+". best bidder: "+best_bidder+"");
+        c.println("..............................................CONTRACT AWARDED TO ID "+id+". best bidder: "+best_bidder+"");
         winner = best_bidder;
     }
 
