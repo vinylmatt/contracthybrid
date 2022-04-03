@@ -32,7 +32,7 @@ agent VacManager extends FIPACNInitiator {
             +participant(arg);
         }
 		s.sleep(3000);
-        /*+contract("1", "test", [], 1000);*/
+        
 
     }
 
@@ -41,35 +41,35 @@ agent VacManager extends FIPACNInitiator {
 
     
     rule +!completed(int id, boolean outcome) {
-        c.println("Contact: " + id + " / Outcome: " + outcome);
+        c.println("..............................................Contact: " + id + " / Outcome: " + outcome);
         FIPACNInitiator::!completed(id, outcome);
     }
 
   rule +$ei.event(task("none")) 
     {
-       c.println("DEBUG ONLY DECIDE TASK where TASK NONEDO NOTHING ");
-		c.println("DEBUG ONLY DECIDED TASK COMPLETE DO NOTHING");
+       //c.println("DEBUG ONLY DECIDE TASK where TASK NONEDO NOTHING ");
+		//c.println("DEBUG ONLY DECIDED TASK COMPLETE DO NOTHING");
 	
     }
 
 rule +$ei.event(task("move")) 
     {
-        c.println("DEBUG ONLY move operation result DO NOTHING");
-		c.println("DEBUG ONLY move operation result DO NOTHING");
+        //c.println("DEBUG ONLY move operation result DO NOTHING");
+		//c.println("DEBUG ONLY move operation result DO NOTHING");
     }	
 
 rule +$ei.event(task("turn")) 
     {
        
-	  	c.println("DEBUG ONLY TURN operation result DO NOTHING");
-		c.println("DEBUG ONLY TURN operation result DO NOTHING");
+	  	//c.println("DEBUG ONLY TURN operation result DO NOTHING");
+		//c.println("DEBUG ONLY TURN operation result DO NOTHING");
     }	
 
 /*this is to catch tasks that are not none or move*/
 rule +$ei.event(task(string task)) 
     {
-     	c.println("DEBUG ONLY MSG from TASK: "+ task +"ing STARTS............. DO NOTHING");
-		c.println("DEBUG ONLY MSG from TASK:  "+ task +"ing ENDS. DID NOTHING");
+     	c.println("TASK: "+ task +"ing STARTS  DO NOTHING");
+		c.println("TASK:  "+ task +"ing ENDS. DID NOTHING");
     }
 
 
@@ -87,7 +87,7 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 rule +!makecontract(int x, int y) : messagecount(int tick) {
 		int n = 1; 
 		n = tick + n;
-		c.println("Sending message number "+n+"  ");
+		c.println(".......................................................................Sending message number "+n+"  ");
 		-+messagecount(n);
 		+contract(n, "test", [], 10000); 
 		s.sleep(100);
@@ -428,17 +428,29 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
 		c.println("4.2.1 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Backup beep beep beep");
-		d.dumpBeliefs();
-		ei.dumpState();
 		s.sleep(10000);
 		!decide();
 		c.println("4.2.2 DECIDE AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". ");
-		d.dumpBeliefs();
-		ei.dumpState();
 		s.sleep(10000);
 		!decide();
     
     }   
+
+
+
+rule +!move(string direction)   {
+		c.println("......................................................................4.3.1 Move BLOCKED in direction "+direction+" DEBUG SERIOUS FAIL EXIT");
+		d.dumpBeliefs();
+	
+
+		s.sleep(50000);
+
+		s.exit();
+
+
+}
+
+
 
 	/*Robo rules clean*/
 

@@ -1,4 +1,5 @@
 agent FIPACNInitiator extends FIPAContractNet {
+    module Console c;
     types cnp_initiator {
         formula participant(string);
         formula awarded(int, string);
@@ -43,6 +44,7 @@ agent FIPACNInitiator extends FIPAContractNet {
 
         // Return name of winner...
         +awarded(id, best_bidder);
+        c.println("...............................................CONTRACT AWARDED TO ID "+id+". best bidder: "+best_bidder+"");
         winner = best_bidder;
     }
 
