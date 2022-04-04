@@ -35,7 +35,7 @@ agent Main {
 
 
 		while(true) {
-			/*c.println("I am main loop, I keep looping every 5sec");*/
+			//c.println("I am main loop, I keep looping every 5sec could I count epoch?");
 			s.sleep(5000);
 		}
 
