@@ -39,7 +39,7 @@ agent VacManager extends FIPACNInitiator {
 
     
     rule +!completed(int id, boolean outcome) {
-        c.println(".............................................Contact: " + id + " / Outcome: " + outcome);
+        //c.println(".............................................Contact: " + id + " / Outcome: " + outcome);
         FIPACNInitiator::!completed(id, outcome);
     }
 
@@ -83,7 +83,7 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 rule +!makecontract(int x, int y) : messagecount(int tick) {
 		int n = 1; 
 		n = tick + n;
-		c.println("......................................................................Sending message number "+n+"  ");
+		//c.println("......................................................................Sending message number "+n+"  ");
 		-+messagecount(n);
 		+contract(n, "test", [], 10000); 
 		s.sleep(100);
@@ -425,7 +425,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ~fr
     }
 
     rule +!decide()  {
-		c.println("3.3.1 BECAUSE NO OTHER DECISIONS we are in the hole DECIDE AGAIN");
+		//c.println("3.3.1 BECAUSE NO OTHER DECISIONS we are in the hole DECIDE AGAIN");
 		//d.dumpBeliefs();
 		//ei.dumpState();
 		//c.println("3.3.2 wait 10 to decide");
@@ -438,7 +438,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ~fr
     }
 
   rule +!houdini()  {
-		c.println("HOUDINI");
+		//c.println("HOUDINI");
 		//d.dumpBeliefs();
 		//ei.dumpState();
 		//c.println("3.3.2 wait 10 to decide");
@@ -451,11 +451,11 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ~fr
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction) {
 
-		c.println("4.0 Move from X "+A+" Y "+B+" facing: "+d+" moving in direction "+direction+" .");
+		//c.println("4.0 Move from X "+A+" Y "+B+" facing: "+d+" moving in direction "+direction+" .");
         ei.move(direction);
 		s.sleep(10);
 		+location_status(A, B, "visited", d);
-		c.println("4.1 Moved from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" complete");
+		//c.println("4.1 Moved from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" complete");
 	
     }
 
@@ -463,7 +463,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 /*Robo rule move*/
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"obstacle") {
-		c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was obstacle ");			
+		//c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was obstacle ");			
 		s.sleep(3000);
 
 		!decide();
@@ -471,7 +471,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"vac") {
-		c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was ..........................new VAC!!!!!!! ");			
+		//c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was ..........................new VAC!!!!!!! ");			
 		s.sleep(3000);
 
 		!decide();
@@ -479,11 +479,11 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
-		c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". ");
+		//c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". ");
 		s.sleep(1000);
 
 		!decide();
-		c.println("4.2 DECIDE AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" after move blocked ");
+		//c.println("4.2 DECIDE AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" after move blocked ");
 		s.sleep(1000);
 
 		!decide();
@@ -494,9 +494,9 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction)   {
-		c.println("ERROR 4.3.1 Move BLOCKED in direction "+direction+" DEBUG SERIOUS FAIL");
+		//c.println("ERROR 4.3.1 Move BLOCKED in direction "+direction+" DEBUG SERIOUS FAIL");
 		s.sleep(1000);// randomise so they restart at different times
-		c.println("..................................decide again Move BLOCKED in direction "+direction+" DEBUG SERIOUS FAIL");
+		//c.println("..................................decide again Move BLOCKED in direction "+direction+" DEBUG SERIOUS FAIL");
 		!decide();
 }
 
@@ -620,7 +620,7 @@ rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.dir
 /*Robo rules clean*/
 rule +!clean(string name) : ~ei.square("here","dust")
     {
-        c.println("ERROR ONLY 5.3 Drop Non Clean Square " + name +" ." );
+        //c.println("ERROR ONLY 5.3 Drop Non Clean Square " + name +" ." );
 	
 	
 		s.sleep(5000);
@@ -630,7 +630,7 @@ rule +!clean(string name) : ~ei.square("here","dust")
 
 rule +!clean(string name) 
     {
-        c.println("ERROR ONLY 5.3 Can't clean here makes no sense in this square, decide again: " + name +" ." );
+        //c.println("ERROR ONLY 5.3 Can't clean here makes no sense in this square, decide again: " + name +" ." );
 		s.sleep(5000);
 		!decide();
 		/*s.exit();*/
@@ -638,7 +638,7 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-        c.println("ERROR ONLY 5.4 Can't clean here makes no sense in this square: ." );
+        //c.println("ERROR ONLY 5.4 Can't clean here makes no sense in this square: ." );
 		
 
 

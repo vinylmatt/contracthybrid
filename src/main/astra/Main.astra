@@ -8,22 +8,21 @@ agent Main {
 
 	rule +!main(list args) {
 		ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
+		/*ei.init([generation("40 s"), level("2")]);*/
+		//ei.init([generation("40 s"), level("8")]);
 		ei.init([generation("no"), level("8")]);
 		ei.join();
 		ei.startEnv();
-		
-		
 		list robots = ei.freeEntities();
-
 		s.sleep(200);
-/*Manager comes to work first*/
+		/*Manager comes to work first*/
 		int i = 0;
 				s.createAgent(p.valueAsString(robots, i), "VacManager");
 				s.sleep(100);
 				s.setMainGoal(p.valueAsString(robots, i), robots);
 		i = i + 1;
 
-/*Loop the other Vacs*/
+		/*Loop the other Vacs*/
 
           while (i < p.size(robots)) {
 			  	s.sleep(100);
