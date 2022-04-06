@@ -578,7 +578,7 @@ rule +!decide()  {
 !decide();
     }
 
-rule +!houdini() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
+rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
 		c.println("ESCAPE Routine");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
@@ -587,10 +587,10 @@ rule +!houdini() : ei.location(long A, long B) & ei.direction(string d) & reset(
 		c.println("TOTAL RESET BELIEFS");
 		s.sleep(1000);
 		-+reset("yes");
-		!houdini();
+		!zap();
 }
 
-rule +!houdini() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
+rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
 		c.println("ESCAPE Routine TRY LEFT");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		c.println("TOTAL RESET BELIEFS now move moving left");
@@ -599,7 +599,7 @@ rule +!houdini() :  ei.location(long A, long B) & ei.direction(string d) & free(
 		-+reset("no");
     }
 
-rule +!houdini() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
+rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
 		c.println("ESCAPE Routine try right");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		c.println("TOTAL RESET BELIEFS now move right");
@@ -608,7 +608,7 @@ rule +!houdini() :  ei.location(long A, long B) & ei.direction(string d) & free(
 		-reset("no");
     }
 
-rule +!houdini() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
+rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
 		c.println("ESCAPE Routine moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
@@ -675,7 +675,7 @@ rule +!move(string direction)   {
 		!decide();
 		s.sleep(1000);
 		!dustturn();
-		!houdini();
+		!zap();
 		}
 
 /*nodust-cleaner only */
@@ -740,25 +740,25 @@ rule +!clean(string name) : ~ei.square("here","dust")
 
 rule +!clean(string name) 
     {
-		c.println("ERROR 5.3 Can't clean here makes no sense in this square, houdini from square: " + name +" ." );
+		c.println("ERROR 5.3 Can't clean here makes no sense in this square, zap from square: " + name +" ." );
 		
 		!dustturn();
 	
 		s.sleep(5000);
-		!houdini();
+		!zap();
 		/*s.exit();*/
     }
    
 rule +!clean() 
     {
-		c.println("ERROR Dust appeared under us most likely houdini " );
+		c.println("ERROR Dust appeared under us most likely zap " );
 		
 		ei.clean();
 		-+nodust(0);
 		ei.light("off");
 		s.sleep(50);
 		s.sleep(5000);
-		!houdini();
+		!zap();
 	
     }
 
