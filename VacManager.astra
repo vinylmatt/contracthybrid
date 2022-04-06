@@ -508,6 +508,7 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
     {
         //c.println("5.1 cleaning x "+A+" y "+B+" facing "+d+"and reset dust count." );
 		ei.clean();
+		!orient(A,B,d);
 
 		/*lose all beliefs*/
 		-+location_status(A, B, "cleaned", d);
@@ -625,6 +626,7 @@ rule +!clean(string name) : ~ei.square("here","dust")
 	
 		s.sleep(5000);
 		!decide();
+		
 		/*s.exit();*/
     }
 

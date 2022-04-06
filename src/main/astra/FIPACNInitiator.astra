@@ -1,10 +1,12 @@
 agent FIPACNInitiator extends FIPAContractNet {
     module Console c;
+    module EIS ei;
     types cnp_initiator {
         formula participant(string);
         formula awarded(int, string);
         formula best_bid(int, string, int);
         formula completed(int, boolean);
+        
     }
 
     // DELIBERATION RULES
@@ -92,5 +94,83 @@ agent FIPACNInitiator extends FIPAContractNet {
         -awarded(id, sender);
         -best_bid(id, sender, value);
         -contract(id, type, params, deadline);
+
     }
+
+    rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.direction(string direction)  {		
+
+		if (direction == "north") {
+			if (name == "left") 			{	A = A-1; 			!makecontract(A,B);	
+							
+				}
+			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!makecontract(A,B); 	
+							
+				}
+			if (name == "forward") 			{  B =B-1;  			!makecontract(A,B); 	
+							
+				}
+			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!makecontract(A,B); 	
+							
+				}
+			if (name == "right") 			{  A= A+1; 				!makecontract(A,B); 	
+				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning....  .");			
+				}
+  			}
+			
+	    if (direction == "south") {
+				if (name == "left") {  				A = A+1; 			!makecontract(A,B);	
+								
+					}
+				if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "forward") 			{  B =B+1;  			!makecontract(A,B); 	
+								
+					}
+				if (name == "forwardRight") 	{  A= A-1; B= B+1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "right") 			{  A= A-1; 				!makecontract(A,B); 	
+								
+					}
+			}
+
+
+	    if (direction == "east") {		
+				if (name == "left") {  				B = B-1; 			!makecontract(A,B);	
+					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning..... ");			
+					}
+				if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "forward") 			{  A= A+1;	 			!makecontract(A,B); 	
+								
+					}
+				if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "right") 			{  B= B+1; 				!makecontract(A,B); 	
+						
+						}
+			}
+
+	    if (direction == "west") {	
+
+				if (name == "left")				{  	B = B+1; 			!makecontract(A,B);	
+								
+					}
+				if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "forward") 			{  A= A-1;				!makecontract(A,B); 	
+								
+					}
+				if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!makecontract(A,B); 	
+								
+					}
+				if (name == "right") 			{  B= B-1; 				!makecontract(A,B); 	
+					
+						}
+			}
+	}
 }
