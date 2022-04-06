@@ -51,7 +51,7 @@ agent VacCleaner extends FIPACNParticipant {
 
     rule +!fulfil(string id, "test", []) {
 		c.println("...................................I won "+id+" bid!!! I am the laziest robot wake up!");
-		!decide();
+		!houdini();
     }
 /*Cleaner Only rules*/
 /*Cleaner Only rules*/
@@ -720,19 +720,8 @@ rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction
 /*get around unfree*/
 
 rule +!decide()  {
-       
-		//c.println(".................................................................Undecidable END OF WORLD in 20 take a picture");
-		d.dumpBeliefs();
-		//complier no see this as mistake if called with ei
-		d.printStackTrace();
-		ei.dumpState();
-		s.sleep(20000);
-		s.exit();
-		//c.println(".................................................................Undecidable END OF WORLD in 20 take a picture");
-		//c.println(".................................................................Undecidable END OF WORLD in 20 take a picture");
-		//c.println(".................................................................Undecidable END OF WORLD in 20 take a picture");
-
-
+       s.sleep(50);
+		!decide();
     }
 
 
@@ -740,12 +729,12 @@ rule +!decide()  {
 
 
 rule +!houdini() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
-		//c.println("ESCAPE Routine");
+		c.println("ESCAPE Routine");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
-		//c.println("TOTAL RESET BELIEFS");
+		c.println("TOTAL RESET VISITED BELIEFS");
 		s.sleep(1000);
 		-+reset("yes");
 		!houdini();

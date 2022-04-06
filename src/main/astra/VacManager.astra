@@ -53,19 +53,19 @@ rule +!completed(int id, boolean outcome) {
 
 rule +$ei.event(task("none")) 
     {
-
+!dustturn();
 
     }
 
 rule +$ei.event(task("move")) 
     {
-d.dumpBeliefs();
+!dustturn();
     }	
 
 
 rule +$ei.event(task("turn")) 
     {
-       
+       !dustturn();
 
 	
     }	
@@ -74,7 +74,7 @@ rule +$ei.event(task("turn"))
 rule +$ei.event(task(string task)) 
     {
 
-
+!dustturn();
     }
 
 
@@ -280,6 +280,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 		c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
 		!dustturn();
+		!dustturn();
 		-+wall_status("following");
 		!wallcount();
 		!move("forward");
@@ -290,6 +291,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
+		!dustturn();
 		-+wall_status("following");
 		!wallcount();
 		!move("forward");
@@ -299,6 +301,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
 		c.println("E4x "+A+" y "+B+" d "+ d +" in open space ?.");
+		!dustturn();
 		!dustturn();
 		!wallcount();
 		!move("forward");
