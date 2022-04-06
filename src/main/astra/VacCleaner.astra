@@ -17,8 +17,7 @@ agent VacCleaner extends FIPACNParticipant {
 		formula reset(string);
 		formula binarychoice(string, string);
 		formula fullchoice(string, string, string);
-		
-		 }
+		}
 
 	initial nodust(0);
 	initial wallcount(0);
@@ -42,7 +41,8 @@ agent VacCleaner extends FIPACNParticipant {
 
 
 
-/*Cleaner Only*/
+/*Cleaner Only rules*/
+/*Cleaner Only rules*/
     rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & nodust(int dustturn) {
        
 		value = dustturn;
@@ -53,7 +53,8 @@ agent VacCleaner extends FIPACNParticipant {
 		//c.println("...................................I won "+id+" bid!!! I am the laziest robot wake up!");
 		!decide();
     }
-
+/*Cleaner Only rules*/
+/*Cleaner Only rules*/
 rule +$ei.event(task("none")) 
     {
     //c.println("REM ADVICE: TASK where TASK NONEDO NOTHING ");
