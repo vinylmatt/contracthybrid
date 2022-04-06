@@ -10,7 +10,7 @@ agent Main {
 		ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
 		//ei.init([generation("40 s"), level("8")]);
 		//ei.init([generation("no"),level("test20x12.vwl")]);
-		ei.init([generation("no"), level("4")]);
+		ei.init([generation("no"), level("2")]);
 		ei.join();
 		ei.startEnv();
 		list robots = ei.freeEntities();
