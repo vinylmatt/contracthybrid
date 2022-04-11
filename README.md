@@ -4,6 +4,10 @@ Implement plan
 effective robots at a local level that will chase down dirt and get the job done
 need to handle their own states - self reliant. Handle variety of states sizes of maps and obstacles.
 helpful to each other, but not to the point of getting confused or getting in each other's way.
+
+We have to sense a number of different conditions.
+THe dust hunger takes cares of opening up closed off areas.
+
 They share a mechanism to share parts of routes and verboten areas that have been explored
 plan was to test build it out, but was imposible to get 100% stability
 Tuning for emergent behavours of spreading out and looking for dust

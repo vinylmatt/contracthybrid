@@ -9,7 +9,7 @@ agent VacManager extends FIPACNInitiator {
         formula vac(string);
 		formula move(string, int );
 		formula messagecount(int);
-		formula makecontract();
+		formula makeperformancereport();
 		formula location_status(long, long, string, string);
 		formula orient(int,int,string,string);
 		formula free(string);
@@ -83,12 +83,12 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 
 
 /*signalling*/
-rule +!makecontract(int x, int y) : messagecount(int tick) {
+rule +!makeperformancereport(int x, int y) : messagecount(int tick) {
 		int n = 1; 
 		n = tick + n;
 		c.println("......................................................................Sending message number "+n+"  ");
 		-+messagecount(n);
-		+contract(n, "test", [], 10000); 
+		+performancereport(n, "test", [], 10000); 
 		s.sleep(100);
 }
 
@@ -590,19 +590,19 @@ rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.dir
 		if (direction == "north") {
 
 
-			if (name == "left") 			{	A = A-1; 			!makecontract(A,B);	
+			if (name == "left") 			{	A = A-1; 			!makeperformancereport(A,B);	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!makecontract(A,B); 	
+			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forward") 			{  B =B-1;  			!makecontract(A,B); 	
+			if (name == "forward") 			{  B =B-1;  			!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!makecontract(A,B); 	
+			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "right") 			{  A= A+1; 				!makecontract(A,B); 	
+			if (name == "right") 			{  A= A+1; 				!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning....  .");			
 				}
 			
@@ -610,19 +610,19 @@ rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.dir
 			
 if (direction == "south") {
 
-			if (name == "left") {  				A = A+1; 			!makecontract(A,B);	
+			if (name == "left") {  				A = A+1; 			!makeperformancereport(A,B);	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!makecontract(A,B); 	
+			if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forward") 			{  B =B+1;  			!makecontract(A,B); 	
+			if (name == "forward") 			{  B =B+1;  			!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardRight") 	{  A= A-1; B= B+1;		!makecontract(A,B); 	
+			if (name == "forwardRight") 	{  A= A-1; B= B+1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "right") 			{  A= A-1; 				!makecontract(A,B); 	
+			if (name == "right") 			{  A= A-1; 				!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
 			
@@ -631,19 +631,19 @@ if (direction == "south") {
 
 if (direction == "east") {		
 
-			if (name == "left") {  				B = B-1; 			!makecontract(A,B);	
+			if (name == "left") {  				B = B-1; 			!makeperformancereport(A,B);	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning..... ");			
 				 }
-			if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!makecontract(A,B); 	
+			if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forward") 			{  A= A+1;	 			!makecontract(A,B); 	
+			if (name == "forward") 			{  A= A+1;	 			!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!makecontract(A,B); 	
+			if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "right") 			{  B= B+1; 				!makecontract(A,B); 	
+			if (name == "right") 			{  B= B+1; 				!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");	
 					}
 			
@@ -652,19 +652,19 @@ if (direction == "east") {
 
 if (direction == "west") {	
 
-			if (name == "left")				{  	B = B+1; 			!makecontract(A,B);	
+			if (name == "left")				{  	B = B+1; 			!makeperformancereport(A,B);	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!makecontract(A,B); 	
+			if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forward") 			{  A= A-1;				!makecontract(A,B); 	
+			if (name == "forward") 			{  A= A-1;				!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!makecontract(A,B); 	
+			if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
 				}
-			if (name == "right") 			{  B= B-1; 				!makecontract(A,B); 	
+			if (name == "right") 			{  B= B-1; 				!makeperformancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");
 					}
   		}

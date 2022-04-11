@@ -2,12 +2,7 @@
 	"folders": [
 		{
 			"path": "..\\..\\.."
-		},
-		{
-			"path": "..\\..\\..\\..\\astra-cnp"
 		}
 	],
-	"settings": {
-		"java.configuration.updateBuildConfiguration": "automatic"
-	}
+	"settings": {}
 }

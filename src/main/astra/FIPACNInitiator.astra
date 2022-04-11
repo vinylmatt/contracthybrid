@@ -46,7 +46,7 @@ agent FIPACNInitiator extends FIPAContractNet {
 
         // Return name of loser...
         +awarded(id, worst_performer);
-        c.println("Jack Welsh style performance review is done for the "+id+"th time. "+worst_performer+" is this round's lazy dirtbag.");
+        c.println("Performance review is done for the "+id+"th time. "+worst_performer+" is this round's lazy dirtbag.");
         loser = worst_performer;
     }
 
@@ -97,80 +97,80 @@ agent FIPACNInitiator extends FIPAContractNet {
 
     }
 
-    rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.direction(string direction)  {		
+    /*rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.direction(string direction)  {		
 
 		if (direction == "north") {
-			if (name == "left") 			{	A = A-1; 			!makecontract(A,B);	
+			if (name == "left") 			{	A = A-1; 			!performancereport(A,B);	
 							
 				}
-			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!makecontract(A,B); 	
+			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!performancereport(A,B); 	
 							
 				}
-			if (name == "forward") 			{  B =B-1;  			!makecontract(A,B); 	
+			if (name == "forward") 			{  B =B-1;  			!performancereport(A,B); 	
 							
 				}
-			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!makecontract(A,B); 	
+			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!performancereport(A,B); 	
 							
 				}
-			if (name == "right") 			{  A= A+1; 				!makecontract(A,B); 	
+			if (name == "right") 			{  A= A+1; 				!performancereport(A,B); 	
 				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning....  .");			
 				}
   			}
 			
 	    if (direction == "south") {
-				if (name == "left") {  				A = A+1; 			!makecontract(A,B);	
+				if (name == "left") {  				A = A+1; 			!performancereport(A,B);	
 								
 					}
-				if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!makecontract(A,B); 	
+				if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "forward") 			{  B =B+1;  			!makecontract(A,B); 	
+				if (name == "forward") 			{  B =B+1;  			!performancereport(A,B); 	
 								
 					}
-				if (name == "forwardRight") 	{  A= A-1; B= B+1;		!makecontract(A,B); 	
+				if (name == "forwardRight") 	{  A= A-1; B= B+1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "right") 			{  A= A-1; 				!makecontract(A,B); 	
+				if (name == "right") 			{  A= A-1; 				!performancereport(A,B); 	
 								
 					}
 			}
 
 
 	    if (direction == "east") {		
-				if (name == "left") {  				B = B-1; 			!makecontract(A,B);	
+				if (name == "left") {  				B = B-1; 			!performancereport(A,B);	
 					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning..... ");			
 					}
-				if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!makecontract(A,B); 	
+				if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "forward") 			{  A= A+1;	 			!makecontract(A,B); 	
+				if (name == "forward") 			{  A= A+1;	 			!performancereport(A,B); 	
 								
 					}
-				if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!makecontract(A,B); 	
+				if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "right") 			{  B= B+1; 				!makecontract(A,B); 	
+				if (name == "right") 			{  B= B+1; 				!performancereport(A,B); 	
 						
 						}
 			}
 
 	    if (direction == "west") {	
 
-				if (name == "left")				{  	B = B+1; 			!makecontract(A,B);	
+				if (name == "left")				{  	B = B+1; 			!performancereport(A,B);	
 								
 					}
-				if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!makecontract(A,B); 	
+				if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "forward") 			{  A= A-1;				!makecontract(A,B); 	
+				if (name == "forward") 			{  A= A-1;				!performancereport(A,B); 	
 								
 					}
-				if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!makecontract(A,B); 	
+				if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!performancereport(A,B); 	
 								
 					}
-				if (name == "right") 			{  B= B-1; 				!makecontract(A,B); 	
+				if (name == "right") 			{  B= B-1; 				!performancereport(A,B); 	
 					
 						}
 			}
-	}
+	}*/
 }

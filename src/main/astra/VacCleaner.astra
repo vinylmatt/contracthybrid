@@ -30,8 +30,8 @@ agent VacCleaner extends FIPACNParticipant {
 	
 	
 	rule +!main([string name]) {
-		//c.println("Heroic worker is: " + s.name());
-        //c.println("and is in comms to: " + name);
+		c.println("Heroic worker is: " + s.name());
+        c.println("and is in comms to: " + name);
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
         ei.join();
         ei.link(s.name());
@@ -51,6 +51,7 @@ agent VacCleaner extends FIPACNParticipant {
 
     rule +!fulfil(string id, "test", []) {
 		c.println("I really sucked in manager's "+id+"th round of performance reviews! Going for retraining...");
+		d.dumpBeliefs();
 		!zap();
 		c.println("That was refreshing, where am I?");
     }
@@ -201,13 +202,15 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("left")  &
     }
 /*add a rule to catch running into a dead end with dust*/
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.location(long A, long B) & lastmove(long X, long Y, string d )  {
-		//c.println("DEADEND1-D-dusthere-11 deadend ");
+		c.println("DEADEND1-D-dusthere-11 deadend ");
 		ei.light("on");
 	    !clean();
+		-location_status(A, B, "deadend", d);
+		-location_status(X, Y, "deadend", d);
 		!move("back");
-		//c.println("DEADEND2 recording at x "+X+" y "+Y+" d "+d+"...");
-		+location_status(X, Y, "deadend", d); 
-		//c.println("DEADEND3 entrance to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
+		c.println("Moved back we should be at "+X+" y "+Y+" d "+d+"...");
+
+		c.println("DEADEND3 entrance to DEADEND marker removed at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100); 
     }
@@ -528,6 +531,15 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 		s.sleep(100);    
     }
 
+rule +!decide() : free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
+       
+		c.println("just plain old forwARD x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		!dustturn();
+		+location_status(A, B, "visited", d);
+		!move("forward");
+		s.sleep(100);    
+    }
+
 rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
 		//c.println("E16 DEADEND x "+A+" y "+B+" d "+ d +" *** ALT left *** .");
@@ -672,12 +684,13 @@ rule +!decide() : ei.square("right",  "empty")  {
 /*Deadend detect rule below*//*Deadend rule below*/
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d ) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("DEADEND AT x "+A+" y "+B+".");
+		c.println("DEADEND AT x "+A+" y "+B+".");
 		!dustturn();
-		!move("back");
-		//c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
+		c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
 		+location_status(X, Y, "deadend", d); 
-		//c.println("entrace to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
+		!move("back");
+
+		c.println("entnrace to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100);  
 
@@ -686,10 +699,10 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
 
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d )  {
        
-		//c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
+		c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
 		!dustturn();
 		!move("back");
-		//c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
+		c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
 		+location_status(X, Y, "deadend", d); 
 		//c.println("entrance to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
@@ -729,44 +742,53 @@ rule +!decide()  {
 
 
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
-		c.println("RESET Routine");
+		c.println("RESET Routine Initiated 1");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
-		c.println("TOTAL RESET VISITED BELIEFS");
+		c.println("TOTALLY RESET VISITED BELIEFS");
 		s.sleep(1000);
 		-+reset("yes");
 		!zap();
 }
 
+rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
+		c.println("RESET Routine TRY MOVING IN "+d+" .");
+		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
+		//c.println("TOTAL RESET BELIEFS now move moving left");
+		s.sleep(1000);
+		!move(d);
 
+    }
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
 		c.println("RESET Routine TRY LEFT");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		//c.println("TOTAL RESET BELIEFS now move moving left");
 		s.sleep(1000);
 		!move("left");
-		-+reset("no");
+		
+	
     }
 
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
 		c.println("RESET Routine try right");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
-		//c.println("TOTAL RESET BELIEFS now move right");
+		//c.println("TOTAL RESET BELIEFS now move right");z
 		s.sleep(1000);
 		!move("right");
-		-+reset("no");
+
     }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
 		c.println("RESET Routine moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
-		s.sleep(1000);
-		!move("back");
+		s.sleep(10000);
 		-+reset("no");
+		!zap();
+	
 	
     }
 
@@ -776,14 +798,18 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 
 /*Robo rule move*/
 
-rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction) & ~location_status(A, B, "deadend", d) {
+rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction) {
 
 		//c.println("4.0 Move X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");			
         ei.move(direction);
 		s.sleep(100);
 		!dustturn();
 		-+lastmove(A, B, d);
-		/*???decide+location_status(A, B, "visited", d);*/
+		
+		-+reset("no");
+		//c.println("Removed reset belief mode X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");
+		/*???decide+location_s
+		tatus(A, B, "visited", d);*/
 	
     }
 

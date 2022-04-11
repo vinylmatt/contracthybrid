@@ -10,15 +10,15 @@ agent FIPACNParticipant extends FIPAContractNet {
         +contract(id, type, params, deadline);
 
         try {
-            !bid(id, string name, int value);
+            !bid(id, string name, int score);
 
-            send(propose, sender, bid(id, name, value));
+            send(propose, sender, bid(id, name, score));
         } recover {
             send(refuse, sender, contract(id, type, params, deadline));
         }
     }
 
-    rule @message(accept-proposal, string sender, bid(int id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
+    rule @message(accept-proposal, string sender, bid(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
         +accepted(id, sender);
         try {
             !fulfil(id, type, params);
@@ -28,19 +28,19 @@ agent FIPACNParticipant extends FIPAContractNet {
         }
     }
 
-    rule @message(reject-proposal, string sender, bid(int id, system.name(), int value)) : contract(id, string type, list params, int deadline) {
+    rule @message(reject-proposal, string sender, bid(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
         +rejected(id, sender);
     }
 
-    rule +!bid(int id, string name, int value) {
-        !generate_bid(id, int my_value);
+    rule +!bid(int id, string name, int score) {
+        !generate_bid(id, int my_score);
         
         name = system.name();
-        value = my_value;
-        +bid(id, name, value);
+        score = my_score;
+        +bid(id, name, score);
     }
     
-    rule +!generate_bid(int id, int value) : contract(id, string type, list params, int deadline) {
+    rule +!generate_bid(int id, int score) : contract(id, string type, list params, int deadline) {
         system.fail();
     }
 
