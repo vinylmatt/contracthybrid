@@ -31,7 +31,7 @@ agent VacCleaner extends FIPACNParticipant {
 	
 	rule +!main([string name]) {
 		c.println("Heroic worker is: " + s.name());
-        c.println("and is in comms to: " + name);
+        c.println("in network with members: " + name);
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
         ei.join();
         ei.link(s.name());
@@ -43,13 +43,13 @@ agent VacCleaner extends FIPACNParticipant {
 
 /*Cleaner Only rules*/
 /*Cleaner Only rules*/
-    rule +!generate_bid(int id, int value) : contract(id, "test", [], int deadline) & nodust(int dustturn) {
+    rule +!generate_bid(int id, int value) : contract(id, "performancereview", [], int deadline) & nodust(int dustturn) {
        
 		value = dustturn;
 	
     }
 
-    rule +!fulfil(string id, "test", []) {
+    rule +!fulfil(string id, "performancereview", []) {
 		c.println("I really sucked in manager's "+id+"th round of performance reviews! Going for retraining...");
 		d.dumpBeliefs();
 		!zap();
@@ -59,7 +59,10 @@ agent VacCleaner extends FIPACNParticipant {
 rule +$ei.event(task("none")) 
     {
     //c.println("REM ADVICE: TASK where TASK NONEDO NOTHING ");
-		//d.printStackTrace();
+		/*d.printStackTrace();
+		ei.dumpState();
+		d.dumpBeliefs();*/
+		
 	//c.println("REM ADVICE: DECIDED TASK COMPLETE DO NOTHING");
 	
     }
@@ -388,20 +391,36 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 		!move("right");
 		-location_status(A, B, "visited", d);
     }
+/*wall following dectection*/
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
 
-rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
+		c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
+		!dustturn();
+		-wall_status("following");
+		!move("right");
+    }
 
-		//c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle")  & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
+
+		c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
 		!move("forward");
     }
 
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
+       
+		c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
+		!dustturn();
+		-wall_status("following");
+		!move("left");
+
+    }
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
+		c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
@@ -667,7 +686,7 @@ rule +!decide() : ei.square("right", "empty") & ei.location(long A, long B) & ei
 
 rule +!decide() : ei.square("right",  "empty")  {
        
-		//c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
+		c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
 		!dustturn();
 		!move("right");
 		s.sleep(100);
@@ -792,7 +811,12 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 	
     }
 
+rule +!zap()  {
+		c.println("FATAL ERROR");
 
+	s.exit();
+	
+    }
 
 
 
@@ -836,7 +860,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)   {
-		//c.println("Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+". by something unexpected ");	
+		c.println("Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+". by something unexpected ");	
 
 		s.sleep(1000);
 		!dustturn();
@@ -844,7 +868,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("4.2.1 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Decide 2x");
+		c.println("4.2.1 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Decide 2x");
 		s.sleep(1000);
 			
 		!dustturn();
@@ -855,7 +879,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		}
 
 rule +!move(string direction)   {
-		//c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
+		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 		!dustturn();
 		s.sleep(1000);// randomise so they restart at different times
 		!decide();
@@ -911,7 +935,7 @@ rule +!clean(string name) : ei.square("here","dust") & ei.location(long A, long 
 
 rule +!clean(string name) : ei.square("here","dust") 
     {
-        //c.println("cleaning I shouldn't run but I do anyway" );
+        c.println("cleaning I shouldn't run but I do anyway" );
 		ei.clean();
 		-+nodust(0);
 		-+wallcount(0);
@@ -921,14 +945,14 @@ rule +!clean(string name) : ei.square("here","dust")
 
 rule +!clean(string name) : ~ei.square("here","dust")
     {
-        //c.println("No dust to clean forget it" );
+        c.println("No dust to clean forget it" );
 		ei.light("off");
 		s.sleep(50);
     }
 
 rule +!clean(string name) 
     {
-		//c.println("ERROR 5.3 Can't clean here makes no sense in this square, zap from square: " + name +" ." );
+		c.println("ERROR 5.3 Can't clean here makes no sense in this square, zap from square: " + name +" ." );
 		
 		!dustturn();
 	
@@ -939,7 +963,7 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-		//c.println("ERROR Dust appeared under us most likely zap " );
+		c.println("ERROR Dust appeared under us most likely zap " );
 		
 		ei.clean();
 		-+nodust(0);

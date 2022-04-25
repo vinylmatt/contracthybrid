@@ -85,7 +85,7 @@ rule +!performancereport(int x, int y) : messagecount(int tick) {
 		n = tick + n;
 		c.println("Require performance report "+n+"  ");
 		-+messagecount(n);
-		+contract(n, "test", [], 10000); 
+		+contract(n, "performancereview", [], 10000); 
 		s.sleep(100);
     }
 

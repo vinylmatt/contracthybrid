@@ -26,6 +26,7 @@ agent VacManager extends FIPACNInitiator {
 	initial reset("no");
 
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac") ;
+	//necessary to reduce number sof rules to bring within limits
 	inference binarychoice(string X, string Y) :- free(X) & free(Y) ;
 	inference fullchoice(string X, string Y, string Z) :- free(X) & free(Y) & free(Z) ;
 
@@ -64,7 +65,7 @@ rule +$ei.event(task("move"))
 
 rule +$ei.event(task("turn")) 
     {
-       
+       -+wallcount(0);
     }	
 
 /*this is to catch tasks that are not none or move*/
@@ -87,7 +88,7 @@ rule +!performancereport(int x, int y) : messagecount(int tick) {
 		n = tick + n;
 		c.println("I'm seeing too much dust around here and I'm not happy, we're going to have our "+n+"th performance review  ");
 		-+messagecount(n);
-		+contract(n, "test", [], 10000); 
+		+contract(n, "performancereview", [], 10000); 
 		s.sleep(100);
     }
 /*Dust rules don't care about deadends, they push the move rules to mark them as open*/
@@ -255,7 +256,7 @@ rule +!decide() :  ei.square("forwardRight","dust")  & free("right") {
     }
 
 /*default forward rule*/
-rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
+rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
 		//c.println("DC1.1 DEFAULT FORWARD "+ d +". OPEN ROAD *** DEFAULT FORWARD *** at x "+A+" y "+B+" .");
 		
@@ -264,35 +265,50 @@ rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft")
 		//c.println("DC1.2 DEFAULT FORWARD COMPLETES "+ d +". OPEN ROAD *** DEFAULT FORWARD *** at x "+A+" y "+B+" .");
     }
 
+rule +!decide() : ei.square("forward", "empty") & free("right") & free("left") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
+       
+		//c.println("DC1.2"+ d +". OPEN ROAD *** ALT RIGHT *** at x "+A+" y "+B+" .");
+		
+		-location_status(A, B, "visited", d);
+		!move("right");
+
+    }
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & free("right") & free("left") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B)  & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
 		//c.println("E1x "+A+" y "+B+" D-FORK empty here & front direction "+ d +". OPEN ROAD going              *** ALT RIGHT ***  at x "+A+" y "+B+" .");
-		
+		!dustturn();
 		
 		!move("right");
 		-location_status(A, B, "visited", d);
     }
+/*wall following dectection*/
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
 
-rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
+		c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
+		//add the signal for performance review here
+		!performancereport(A,B);
+		-wall_status("following");
+		!move("right");
+    }
+
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle")  & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
 
 		c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
-		
 		
 		-+wall_status("following");
 		!wallcount();
 		!move("forward");
     }
 
-
-rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
-		
-		
-		-+wall_status("following");
-		!wallcount();
-		!move("forward");
+		c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
+				//add the signal for performance review here
+		!performancereport(A,B); 
+		-wall_status("following");
+		!move("left");
+
     }
 
 
@@ -619,7 +635,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 
 /*Robo rule move*/
 
-rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction) & ~location_status(A, B, "deadend", d) {
+rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction)  {
 
 		//c.println("4.0 Move X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");			
         ei.move(direction);
@@ -648,19 +664,14 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 
-rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d, "dust") {
-		c.println(".....................Move ALLOWED TO DEADEND from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+". where there was dust by what is a marked deadend ");	
-		ei.move(direction);
-		c.println("....remove DEADEND status from X "+A+" Y "+B+" in direction "+d);	
-		-location_status(A, B, "deadend", d);
-		s.sleep(1000);
-		!decide();
-    }
+
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)   {
-		c.println(".....................Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" by somethoing unexpected ");	
+		c.println(".....................Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" by unexpected ");	
 		s.sleep(1000);
-		
+		/*d.dumpBeliefs();*/
+		/*this triggers when env changes unexpectedly, if we can reach another decision below everything will be OK*/
+		ei.dumpState();
 		!decide();
     }
 
@@ -692,6 +703,7 @@ rule +!wallcount() : wallcount(int tick)
 		n = tick + n;
 		c.println("wallcount is "+n+" . ");
 		-+wallcount(n);
+		
     }
 
 /*Robo rules clean*/
