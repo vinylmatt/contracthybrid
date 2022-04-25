@@ -74,6 +74,10 @@ agent FIPACNInitiator extends FIPAContractNet {
         !completed(id, true);
     }
 
+    rule @message(inform, string sender, deadendreport(long X, long Y,string d)) {
+        c.println("Report Recieved of a dead end entrance at." +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
+    }
+
     rule @message(failure, string sender, contract(int id, string type, list params, int deadline)) {
         !completed(id, false);
     }
@@ -97,80 +101,5 @@ agent FIPACNInitiator extends FIPAContractNet {
 
     }
 
-    /*rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.direction(string direction)  {		
 
-		if (direction == "north") {
-			if (name == "left") 			{	A = A-1; 			!performancereport(A,B);	
-							
-				}
-			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!performancereport(A,B); 	
-							
-				}
-			if (name == "forward") 			{  B =B-1;  			!performancereport(A,B); 	
-							
-				}
-			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!performancereport(A,B); 	
-							
-				}
-			if (name == "right") 			{  A= A+1; 				!performancereport(A,B); 	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning....  .");			
-				}
-  			}
-			
-	    if (direction == "south") {
-				if (name == "left") {  				A = A+1; 			!performancereport(A,B);	
-								
-					}
-				if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "forward") 			{  B =B+1;  			!performancereport(A,B); 	
-								
-					}
-				if (name == "forwardRight") 	{  A= A-1; B= B+1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "right") 			{  A= A-1; 				!performancereport(A,B); 	
-								
-					}
-			}
-
-
-	    if (direction == "east") {		
-				if (name == "left") {  				B = B-1; 			!performancereport(A,B);	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning..... ");			
-					}
-				if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "forward") 			{  A= A+1;	 			!performancereport(A,B); 	
-								
-					}
-				if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "right") 			{  B= B+1; 				!performancereport(A,B); 	
-						
-						}
-			}
-
-	    if (direction == "west") {	
-
-				if (name == "left")				{  	B = B+1; 			!performancereport(A,B);	
-								
-					}
-				if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "forward") 			{  A= A-1;				!performancereport(A,B); 	
-								
-					}
-				if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!performancereport(A,B); 	
-								
-					}
-				if (name == "right") 			{  B= B-1; 				!performancereport(A,B); 	
-					
-						}
-			}
-	}*/
 }

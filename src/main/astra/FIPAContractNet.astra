@@ -1,9 +1,12 @@
 agent FIPAContractNet {
     module System system;
+    module Console c;
 
     types cnp_shared {
         formula contract(int, string, list, int);
         formula bid(int, string, int);
         formula fulfilled(int, string, list);
+
+        formula deadendreport(long, long, string);
     }
 }

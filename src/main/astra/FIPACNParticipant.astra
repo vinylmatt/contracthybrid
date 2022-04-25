@@ -1,8 +1,20 @@
 agent FIPACNParticipant extends FIPAContractNet {
+
     types cnp_participant {
         formula accepted(int /* contract_id*/, string /*awarder*/);
         formula rejected(int /* contract_id*/, string /*awarder*/);
     }
+
+
+    // DELIBERATION RULES
+    rule +deadendreport (long X, long Y, string d) {
+        c.println("....................................YEEHAW" +X+" and " +Y+ "and " +d+" in a message.");
+        send(inform, "Henry", deadendreport(X,Y,d));
+    }
+
+
+
+
 
     // COMMUNUCATION RULES
     rule @message(cfp, string sender, contract(int id, string type, list params, int deadline)) {
@@ -47,4 +59,8 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule +!fulfil(int id, string type, list params) {
         system.fail();
     }
+
+
+
+
 }
