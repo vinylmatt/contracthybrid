@@ -8,5 +8,6 @@ agent FIPAContractNet {
         formula fulfilled(int, string, list);
 
         formula deadendreport(long, long, string);
+        formula location_status(long, long, string, string);
     }
 }

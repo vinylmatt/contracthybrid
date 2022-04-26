@@ -9,7 +9,7 @@ agent VacCleaner extends FIPACNParticipant {
         formula vac(string);
 		formula move(string, int );
 		formula free(string);
-		formula location_status(long, long, string, string);
+
 		formula lastmove(long, long, string);
 		formula wall_status(string);
 		formula nodust(int);
