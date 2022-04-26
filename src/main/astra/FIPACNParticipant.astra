@@ -6,14 +6,26 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
 
-    // DELIBERATION RULES
+    // DELIBERATION RULES working
     rule +deadendreport (long X, long Y, string d) {
-        c.println("....................................YEEHAW" +X+" and " +Y+ "and " +d+" in a message.");
+        c.println("...TX " +X+" and " +Y+ "and " +d+" in a message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
 
+    // new COMMUNUCATION RULES
+    rule @message(inform, string sender, deadendreport(long X, long Y, string d)) {
+        
+        +location_status(X, Y, "deadend", d);
+        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message. WINNER WINNER GO HOME AND REST MATT");
+        /*try {
+            !bid(id, string name, int score);
 
+            send(propose, sender, bid(id, name, score));
+        } recover {
+            send(refuse, sender, contract(id, type, params, deadline));
+        }*/
+    }
 
 
     // COMMUNUCATION RULES

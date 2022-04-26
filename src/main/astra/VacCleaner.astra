@@ -396,7 +396,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 /*wall following dectection*/
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
 
-		c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
+		//c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
 		!dustturn();
 		-wall_status("following");
 		!move("right");
@@ -404,7 +404,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle")  & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
 
-		c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
+		//c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
@@ -422,7 +422,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
+		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
@@ -791,21 +791,21 @@ rule +!decide()  {
 
 
 
-
-
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
 		c.println("RESET Routine Initiated 1");
-		
+		c.println("Beliefs before");
+		d.dumpBeliefs();
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		c.println("TOTALLY RESET VISITED BELIEFS");
+		-+nodust(0);
+		c.println("ResetDust");
 		s.sleep(1000);
 		-+reset("yes");
 		!zap();
+	    c.println("Beliefs after");
+		d.dumpBeliefs();
 }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
@@ -848,7 +848,9 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
     }
 
 rule +!zap()  {
-		c.println("FATAL ERROR");
+		c.println("FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....");
+		d.dumpBeliefs();
+		s.sleep(100000);
 
 	s.exit();
 	

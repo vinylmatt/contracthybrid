@@ -87,12 +87,13 @@ agent FIPACNInitiator extends FIPAContractNet {
 
     rule @message(inform, string sender, deadendreport(long X, long Y,string d)) {
         c.println("Report Recieved of a dead end entrance at." +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
+        !decide();
         -+deadendlocation(X, Y, d);
 
          foreach (participant(string name) ) {
 
-            send(inform, name, location_status(X,Y, "deadend", d));
-            c.println("Report sent to " +name+ ".");
+            send(inform, name, deadendreport(X,Y, d));
+            c.println("Deadend Report sent to " +name+ ".");
 
         }
          
