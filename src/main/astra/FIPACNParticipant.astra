@@ -5,28 +5,32 @@ agent FIPACNParticipant extends FIPAContractNet {
         formula rejected(int /* contract_id*/, string /*awarder*/);
     }
 
-
-    // DELIBERATION RULES working
     rule +deadendreport (long X, long Y, string d) {
-        c.println("...TX " +X+" and " +Y+ "and " +d+" in a message to coordinator.");
+        //c.println("...TX " +X+" and " +Y+ "and " +d+" in a deadend message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
+
+    rule +choicereport (long X, long Y, string d) {
+        //c.println("...TX " +X+" and " +Y+ "and " +d+" in a choice message to coordinator.");
+        send(inform, "Henry", choicereport(X,Y,d));
+    }
 
     // new COMMUNUCATION RULES
     rule @message(inform, string sender, deadendreport(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
-        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message. WINNER WINNER GO HOME AND REST MATT");
-        /*try {
-            !bid(id, string name, int score);
+        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message about deadends. ");
 
-            send(propose, sender, bid(id, name, score));
-        } recover {
-            send(refuse, sender, contract(id, type, params, deadline));
-        }*/
     }
+    
+    // new COMMUNUCATION RULES
+    rule @message(inform, string sender, choicereport(long X, long Y, string d)) {
+        
+        +location_status(X, Y, "visited", d);
+        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message about choice. ");
 
+    }
 
     // COMMUNUCATION RULES
     rule @message(cfp, string sender, contract(int id, string type, list params, int deadline)) {

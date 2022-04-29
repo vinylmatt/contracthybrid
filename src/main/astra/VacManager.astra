@@ -242,7 +242,6 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("fo
    
 		c.println("DUSTFL11  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT");
 		!orient(A, B,"right");
-		!orient(A, B,"right");
 		!move("left");
 		
     }
@@ -314,7 +313,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		c.println("E4x "+A+" y "+B+" d "+ d +" in open space ?.");
+		//c.println("E4x "+A+" y "+B+" d "+ d +" in open space ?.");
 		
 		
 		!wallcount();
@@ -457,7 +456,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		c.println("E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
+		//c.println("E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
 		
 		//mark we have
 		+location_status(A, B, "visited", d);
@@ -478,7 +477,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		c.println("E21 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT LEFT *** .");
+		//c.println("E21 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT LEFT *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("left");
@@ -639,9 +638,10 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 		//c.println("4.0 Move X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");			
         ei.move(direction);
+		-+lastmove(A, B, d);
 		s.sleep(100);
 		
-		-+lastmove(A, B, d);
+		
 		/*???decide+location_status(A, B, "visited", d);*/
 	
     }
@@ -669,10 +669,10 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)   {
 		c.println(".....................Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" by unexpected ");	
 		s.sleep(1000);
-		/*d.dumpBeliefs();*/
+		d.dumpBeliefs();
 		/*this triggers when env changes unexpectedly, if we can reach another decision below everything will be OK*/
 		ei.dumpState();
-		!decide();
+		/*!decide();*/
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
@@ -680,7 +680,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		s.sleep(1000);
 		
 		!decide();
-		c.println("DECIDE AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" after move blocked ");
+		c.println("DECIDED AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" after move blocked ");
 		s.sleep(1000);
 		/*!move("back");*/
 		}
@@ -689,7 +689,7 @@ rule +!move(string direction)   {
 		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 		
 		s.sleep(1000);// randomise so they restart at different times
-		!decide();
+		/*!decide();*/
 		s.sleep(1000);
 		
 		!zap();
@@ -701,7 +701,7 @@ rule +!wallcount() : wallcount(int tick)
 	{
 		int n = 1; 
 		n = tick + n;
-		c.println("wallcount is "+n+" . ");
+		//c.println("wallcount is "+n+" . ");
 		-+wallcount(n);
 		
     }
@@ -759,14 +759,14 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-		c.println("ERROR Dust appeared under us reset beliefs myself " );
+		/*c.println("ERROR Dust appeared under us reset beliefs myself " );
 		
 		ei.clean();
 		
 		ei.light("off");
 		s.sleep(50);
 		s.sleep(5000);
-		!zap();
+		!zap();*/
 	
     }
 

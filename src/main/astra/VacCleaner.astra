@@ -367,6 +367,9 @@ rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft")
 		!dustturn();
 		!move("forward");
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		//c.println("DC1.2 DEFAULT FORWARD COMPLETES "+ d +". OPEN ROAD *** DEFAULT FORWARD *** at x "+A+" y "+B+" .");
     }
 
@@ -375,9 +378,6 @@ rule +!decide() : ei.square("forward", "empty") & free("right") & free("left") &
 		//c.println("DC1.2"+ d +". OPEN ROAD *** ALT RIGHT *** at x "+A+" y "+B+" .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		!move("right");
 
     }
@@ -389,9 +389,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 		
 		!move("right");
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
     }
 /*wall following dectection*/
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
@@ -451,6 +449,9 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		+location_status(A, B, "visited", d);
 		!move("left");
 		s.sleep(100);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		//c.println("2.12.2 Moved left, but right possible too at this fork in road, if we see it again ");
     }
 
@@ -462,9 +463,6 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		
 		!move("right");
 		-location_status(A, B, "visited", d);
-		/*testOnly*/
-		+deadendreport (A, B, d);
-		/*testOnly*/
 		s.sleep(100);
 
     }
@@ -476,6 +474,9 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & fre
 		!dustturn();
 		+location_status(A, B, "visited", d);
 		!move("forward");
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		s.sleep(100);    
     }
 
@@ -485,9 +486,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & fre
 		!dustturn();
 		!move("left");
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
 		s.sleep(100);
     }
 
@@ -496,6 +495,9 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 		//c.println("E9x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("forward");
 		s.sleep(100);    
     }
@@ -506,9 +508,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 		!dustturn();
 		!move("right");
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
 		s.sleep(100);
     }
 
@@ -518,6 +518,9 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 		!dustturn();
 		+location_status(A, B, "visited", d);
 		!move("forward");
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		s.sleep(100);    
     }
 
@@ -528,9 +531,7 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 		!move("left");
 
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
 
 		s.sleep(100);
     }
@@ -540,6 +541,9 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 		//c.println("E13x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("forward");
 		s.sleep(100);    
     }
@@ -549,9 +553,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 		//c.println("E14x "+A+" y "+B+" d "+ d +" *** ALT RIGHT *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
 		!move("right");
 		s.sleep(100);
     }
@@ -573,6 +575,9 @@ rule +!decide() : free("forward") & ei.location(long A, long B) & ei.direction(s
 		!dustturn();
 		+location_status(A, B, "visited", d);
 		!move("forward");
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		s.sleep(100);    
     }
 
@@ -581,9 +586,6 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 		//c.println("E16 DEADEND x "+A+" y "+B+" d "+ d +" *** ALT left *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		!move("left");
 		s.sleep(100);
     }
@@ -597,6 +599,9 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		//c.println("E17 "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT RIGHT *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("right");
 		s.sleep(100);    
     }
@@ -606,9 +611,6 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		//c.println("E18 "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT LEFT *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		!move("left");
 		s.sleep(100);  
 
@@ -622,6 +624,9 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		//mark we have
 		+location_status(A, B, "visited", d);
 		//moving right
+				/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("right");
 		s.sleep(100);    
     }
@@ -631,9 +636,6 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 		//c.println("E20x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		!move("left");
 		s.sleep(100);
     }
@@ -664,6 +666,9 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 		//c.println("e22 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT left *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("left");
 		s.sleep(100);    
     }
@@ -673,9 +678,6 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 		//c.println("e23 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT right *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
 		!move("right");
 		s.sleep(100);  
 
@@ -690,6 +692,9 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 		//c.println("e24 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT left *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
+		/*testOnly*/
+		+choicereport (A, B, d);
+		/*testOnly*/
 		!move("left");
 		s.sleep(100);    
     }
@@ -699,9 +704,7 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 		//c.println("e25 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT right *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
-/*testOnly*/
-+deadendreport (A, B, d);
-/*testOnly*/
+
 		!move("right");
 		s.sleep(100);
     }
@@ -727,22 +730,17 @@ rule +!decide() : ei.square("right",  "empty")  {
     }
 
 
-
-
-
-
-
 /*Deadend detect rule below*//*Deadend rule below*/
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d ) & ~location_status(A, B, "deadend", d) {
        
 		c.println("DEADEND physically AT x "+A+" y "+B+".");
 		!dustturn();
-		c.println("DEADEND entrance recording at x "+X+" y "+Y+" d "+d+"...");
+		//c.println("DEADEND entrance  at x "+X+" y "+Y+" d "+d+" recorded for me");
 		+location_status(X, Y, "deadend", d); 
 
 		!move("back");
 		+deadendreport (X, Y, d);
-		c.println("entnrace to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
+		c.println("DEADEND Entrance recorded at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100);  
 
@@ -793,8 +791,7 @@ rule +!decide()  {
 
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
 		c.println("RESET Routine Initiated 1");
-		c.println("Beliefs before");
-		d.dumpBeliefs();
+
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
@@ -804,8 +801,7 @@ rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no"
 		s.sleep(1000);
 		-+reset("yes");
 		!zap();
-	    c.println("Beliefs after");
-		d.dumpBeliefs();
+
 }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
@@ -850,9 +846,8 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 rule +!zap()  {
 		c.println("FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....");
 		d.dumpBeliefs();
-		s.sleep(100000);
-
-	s.exit();
+		s.sleep(10000);
+		s.exit();
 	
     }
 
@@ -1001,7 +996,7 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-		c.println("ERROR Dust appeared under us most likely zap " );
+		/*c.println("ERROR Dust appeared under us most likely zap " );
 		
 		ei.clean();
 		-+nodust(0);
@@ -1010,7 +1005,7 @@ rule +!clean()
 		
 
 		s.sleep(5000);
-		!zap();
+		!zap();*/
 	
     }
    

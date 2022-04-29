@@ -7,7 +7,7 @@ agent FIPACNInitiator extends FIPAContractNet {
         formula worst_performance(int, string, int);
         formula completed(int, boolean);
         formula deadendlocation(long, long, string);
-        
+        formula choicelocation(long, long, string);
     }
 
     // DELIBERATION RULES
@@ -98,6 +98,25 @@ agent FIPACNInitiator extends FIPAContractNet {
         }
          
     }
+
+            /**
+     * Choice message
+     */
+
+    rule @message(inform, string sender, choicereport(long X, long Y,string d)) {
+        //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
+        !decide();
+        -+choicelocation(X, Y, d);
+
+         foreach (participant(string name) ) {
+
+            send(inform, name, choicereport(X,Y, d));
+            //c.println("Choice Report sent to " +name+ ".");
+
+        }
+  
+    }
+
 
 
     /**
