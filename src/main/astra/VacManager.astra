@@ -12,7 +12,7 @@ agent VacManager extends FIPACNInitiator {
 		
 		formula lastmove(long, long, string);
 		formula wall_status(string);
-		formula wallcount(int);
+		
 		formula reset(string);
 		formula binarychoice(string, string);
 		formula fullchoice(string, string, string);
@@ -22,7 +22,7 @@ agent VacManager extends FIPACNInitiator {
 		}
      
 	initial nodust(0);
-	initial wallcount(0);
+
 	initial reset("no");
 
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac") ;
@@ -92,6 +92,7 @@ rule +!performancereport(int x, int y) : messagecount(int tick) {
 		s.sleep(100);
     }
 /*Dust rules don't care about deadends, they push the move rules to mark them as open*/
+/* elavate because common*/
 rule +!decide() : ei.square("here", "dust") & ei.square("right", "dust") & ei.location(long A, long B) & ei.direction(string d) {
 				//c.println("D1-dust-here-Clean-move-Right  X "+A+" Y "+B+" facing "+d+".");
 		ei.light("on");
@@ -158,6 +159,10 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & ei.location(lon
 	    !clean();
 		!move("back");
     }
+	/* elavate because common*/
+
+
+
 
 rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust") & ei.square("forwardleft", "dust")  & ei.location(long A, long B) & ei.direction(string d) {
 		c.println("DF1-dustforward-01 Lots of dust ahead all three moving forward. CHOICE OF DUST TO BROADCAST!!!!! auction FL one.");
@@ -675,18 +680,10 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		/*!decide();*/
     }
 
-rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
-		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". Did a bot sneak up? Decide");
-		s.sleep(1000);
-		
-		!decide();
-		c.println("DECIDED AGAIN "+A+" Y "+B+"  in direction "+direction+" when facing."+d+" after move blocked ");
-		s.sleep(1000);
-		/*!move("back");*/
-		}
+
 
 rule +!move(string direction)   {
-		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
+		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem. Zapping");
 		
 		s.sleep(1000);// randomise so they restart at different times
 		/*!decide();*/
@@ -696,15 +693,7 @@ rule +!move(string direction)   {
 		}
 
 
-rule +!wallcount() : wallcount(int tick)
 
-	{
-		int n = 1; 
-		n = tick + n;
-		//c.println("wallcount is "+n+" . ");
-		-+wallcount(n);
-		
-    }
 
 /*Robo rules clean*/
 

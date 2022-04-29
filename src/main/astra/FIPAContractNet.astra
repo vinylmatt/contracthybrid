@@ -10,5 +10,22 @@ agent FIPAContractNet {
         formula deadendreport(long, long, string);
         formula choicereport(long, long, string);
         formula location_status(long, long, string, string);
+
+        formula wallcount(int);
     }
+
+
+    rule +!wallcount() : wallcount(int tick)
+
+	{
+		int n = 1; 
+		n = tick + n;
+		//c.println("wallcount is "+n+" . ");
+		-+wallcount(n);
+    }
+
+
+    initial wallcount(0);
+
+
 }

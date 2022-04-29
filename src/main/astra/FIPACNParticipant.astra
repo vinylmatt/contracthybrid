@@ -6,13 +6,13 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
     rule +deadendreport (long X, long Y, string d) {
-        //c.println("...TX " +X+" and " +Y+ "and " +d+" in a deadend message to coordinator.");
+        c.println("...TX " +X+" and " +Y+ "and " +d+" in a deadend message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
 
     rule +choicereport (long X, long Y, string d) {
-        //c.println("...TX " +X+" and " +Y+ "and " +d+" in a choice message to coordinator.");
+        c.println("...TX " +X+" and " +Y+ "and " +d+" in a choice message to coordinator.");
         send(inform, "Henry", choicereport(X,Y,d));
     }
 
@@ -20,7 +20,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule @message(inform, string sender, deadendreport(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
-        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message about deadends. ");
+        c.println(".....RX x" +X+" y" +Y+ "and " +d+" in a message about deadends. ");
 
     }
     
@@ -28,7 +28,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule @message(inform, string sender, choicereport(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
-        c.println(".....RX " +X+" and " +Y+ "and " +d+" in a message about choice. ");
+        c.println(".....RX x" +X+" y" +Y+ "and " +d+" in a message about choice. ");
 
     }
 

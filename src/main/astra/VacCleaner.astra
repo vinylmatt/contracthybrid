@@ -13,14 +13,14 @@ agent VacCleaner extends FIPACNParticipant {
 		formula lastmove(long, long, string);
 		formula wall_status(string);
 		formula nodust(int);
-		formula wallcount(int);
+
 		formula reset(string);
 		formula binarychoice(string, string);
 		formula fullchoice(string, string, string);
 		}
 
 	initial nodust(0);
-	initial wallcount(0);
+
 	initial reset("no");
 
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac") ;
@@ -98,6 +98,7 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 
 
 /*here is dust rules*/
+/* elavate because common*/
 rule +!decide() : ei.square("here", "dust") & ei.square("right", "dust") & ei.location(long A, long B) & ei.direction(string d) {
 		//c.println("D1-dust-here-Clean-move-Right  X "+A+" Y "+B+" facing "+d+".");
 		ei.light("on");
@@ -199,7 +200,7 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("left")  &
 		ei.light("on");
 	    !clean();
 		!move("left");
-    }
+    } 
 /*add a rule to catch running into a dead end with dust*/
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.location(long A, long B) & lastmove(long X, long Y, string d )  {
 		c.println("DEADEND1-D-dusthere-11 deadend ");
@@ -220,6 +221,8 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & ei.location(lon
 	    !clean();
 		!move("back");
     }
+
+/* elavate because common*/
 
 /*near dust rules - move forward*/
 rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust") & ei.square("forwardleft", "dust") {
@@ -932,14 +935,7 @@ rule +!dustturn() : nodust(int tick)
     }
 
 /*nodust-cleaner only */
-rule +!wallcount() : wallcount(int tick)
 
-	{
-		int n = 1; 
-		n = tick + n;
-		//c.println("wallcount is "+n+" . ");
-		-+wallcount(n);
-    }
 
 /*Robo rules clean*/
 
