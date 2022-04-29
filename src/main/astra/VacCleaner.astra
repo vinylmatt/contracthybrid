@@ -53,12 +53,21 @@ agent VacCleaner extends FIPACNParticipant {
 		c.println("That was refreshing, where am I?");
     }
 
+
+rule +$ei.event(task("none")) : reset("yes")
+    {
+    c.println("TASK where TASK NONE during RESET! we must DECIDE! ");
+	-+reset("no");
+	!decide();
+		
+	//c.println("REM ADVICE: DECIDED TASK COMPLETE DO NOTHING");
+	
+    }
+
 rule +$ei.event(task("none")) 
     {
-    //c.println("REM ADVICE: TASK where TASK NONEDO NOTHING ");
-		/*d.printStackTrace();
-		ei.dumpState();
-		d.dumpBeliefs();*/
+    //c.println("REM ADVICE: TASK where TASK NONE DO NOTHING ");
+	
 		
 	//c.println("REM ADVICE: DECIDED TASK COMPLETE DO NOTHING");
 	
@@ -84,7 +93,7 @@ rule +$ei.event(task("turn"))
 /*this is to catch tasks that are not none or move*/
 rule +$ei.event(task(string task)) 
     {
-     	//c.println("REM ADVICE: "+ task +"ing STARTS  DO NOTHING");
+     	c.println("REM ADVICE: "+ task +"ing STARTS DO NOTHING");
 		//c.println("REM ADVICE TASK: "+ task +"ing ENDS. DID NOTHING");
     }
 
@@ -405,7 +414,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle")  & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d)  {
 
-		//c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
+		c.println("x "+A+" y "+B+" d "+ d +" following a LH wall. ");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
@@ -423,7 +432,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
+		c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
 		-+wall_status("following");
 		!wallcount();
@@ -498,9 +507,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 		//c.println("E9x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
-		/*testOnly*/
 		+choicereport (A, B, d);
-		/*testOnly*/
 		!move("forward");
 		s.sleep(100);    
     }
@@ -622,21 +629,17 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 /*if we haven't visited*/
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
+		c.println("E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
 		!dustturn();
-		//mark we have
 		+location_status(A, B, "visited", d);
-		//moving right
-				/*testOnly*/
 		+choicereport (A, B, d);
-		/*testOnly*/
 		!move("right");
 		s.sleep(100);    
     }
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E20x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
+		c.println("E20x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
 		!dustturn();
 		-location_status(A, B, "visited", d);
 		!move("left");
@@ -655,7 +658,7 @@ rule +!decide() : ei.square("left", "empty") & ei.location(long A, long B) & ei.
 
 rule +!decide() : ei.square("left",  "empty")  {
        
-		//c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move left because empty. No dead end protection");
+		c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move left because empty. No dead end protection");
 		!dustturn();
 		!move("left");
 		s.sleep(100);
@@ -666,12 +669,10 @@ rule +!decide() : ei.square("left",  "empty")  {
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.square("forwardRight", "obstacle") & ei.square("forwardLeft", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d){
        
-		//c.println("e22 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT left *** .");
+		c.println("e22 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT left *** .");
 		!dustturn();
 		+location_status(A, B, "visited", d);
-		/*testOnly*/
 		+choicereport (A, B, d);
-		/*testOnly*/
 		!move("left");
 		s.sleep(100);    
     }
@@ -813,6 +814,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) &
 		//c.println("TOTAL RESET BELIEFS now move moving left");
 		s.sleep(1000);
 		!move(d);
+		-+reset("no");
 
     }
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
@@ -821,6 +823,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("lef
 		//c.println("TOTAL RESET BELIEFS now move moving left");
 		s.sleep(1000);
 		!move("left");
+		-+reset("no");
 		
 	
     }
@@ -832,6 +835,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("rig
 		//c.println("TOTAL RESET BELIEFS now move right");z
 		s.sleep(1000);
 		!move("right");
+		-+reset("no");
 
     }
 
@@ -839,9 +843,9 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 		c.println("RESET Routine moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
-		s.sleep(10000);
+		!move("back");
 		-+reset("no");
-		!zap();
+		
 	
 	
     }
@@ -849,6 +853,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 rule +!zap()  {
 		c.println("FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....FATAL ERROR....");
 		d.dumpBeliefs();
+		ei.dumpState();
 		s.sleep(10000);
 		s.exit();
 	
@@ -992,8 +997,8 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-		/*c.println("ERROR Dust appeared under us most likely zap " );
-		
+		c.println("ERROR We were asked to clean but could not clean " );
+		/*
 		ei.clean();
 		-+nodust(0);
 		ei.light("off");

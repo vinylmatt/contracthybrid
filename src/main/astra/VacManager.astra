@@ -159,18 +159,40 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & ei.location(lon
 	    !clean();
 		!move("back");
     }
-	/* elavate because common*/
+/* elavate because common*/
 
-
-
-
-rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust") & ei.square("forwardleft", "dust")  & ei.location(long A, long B) & ei.direction(string d) {
-		c.println("DF1-dustforward-01 Lots of dust ahead all three moving forward. CHOICE OF DUST TO BROADCAST!!!!! auction FL one.");
-		!orient(A,B,"forwardleft");
+/*near dust rules - move forward*/
+rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust") & ei.square("forwardleft", "dust") {
+		//c.println("DF1-dustforward-01 Lots of dust ahead all three moving forward. CHOICE OF DUST TO BROADCAST!!!!!.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);		
     }
+
+rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust")  {
+		//c.println("DF2-dustforward-02 2x Lots of dust ahead and right forward.");
+		ei.light("on");
+		!move("forward");
+		s.sleep(100);
+	}
+
+rule +!decide() : ei.square("forward", "dust") & ei.square("forwardLeft",  "dust")  {
+		//c.println("DF3-dustforward-03 2x Lots of dust ahead and left forward.");
+		ei.light("on");
+		!move("forward");
+		s.sleep(100);
+		//c.println("2.5.5 Moved forward");
+
+	}
+
+rule +!decide() : ei.square("forwardRight","dust") & ei.square("forwardLeft",  "dust") & free("forward")   {
+		//c.println("DF4dustforward-03 2x Lots of dust ahead so drive into the gap. do I ever run?");
+		ei.light("on");
+		!move("forward");
+		s.sleep(100);
+		//c.println("2.5.5 Moved forward");
+
+	}
 
 //dust is plentyful for manager!
 rule +!decide() : ei.square("forward", "dust") & ei.square("left","dust") & ei.location(long A, long B) & ei.direction(string d)  {
@@ -674,9 +696,9 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)   {
 		c.println(".....................Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" by unexpected ");	
 		s.sleep(1000);
-		d.dumpBeliefs();
+		//d.dumpBeliefs();
 		/*this triggers when env changes unexpectedly, if we can reach another decision below everything will be OK*/
-		ei.dumpState();
+		//ei.dumpState();
 		/*!decide();*/
     }
 

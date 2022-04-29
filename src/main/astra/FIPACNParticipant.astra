@@ -12,11 +12,11 @@ agent FIPACNParticipant extends FIPAContractNet {
 
 
     rule +choicereport (long X, long Y, string d) {
-        c.println("...TX " +X+" and " +Y+ "and " +d+" in a choice message to coordinator.");
+        //c.println("...TX " +X+" and " +Y+ "and " +d+" in a choice message to coordinator.");
         send(inform, "Henry", choicereport(X,Y,d));
     }
 
-    // new COMMUNUCATION RULES
+ 
     rule @message(inform, string sender, deadendreport(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
@@ -24,11 +24,15 @@ agent FIPACNParticipant extends FIPAContractNet {
 
     }
     
-    // new COMMUNUCATION RULES
+
     rule @message(inform, string sender, choicereport(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
-        c.println(".....RX x" +X+" y" +Y+ "and " +d+" in a message about choice. ");
+        c.println(".....RX x" +X+" y" +Y+ "and " +d+" in a message about choice. and added 4 dustturns ");
+        !dustturn();
+        !dustturn();
+        !dustturn();
+        !dustturn();
 
     }
 
