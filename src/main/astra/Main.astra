@@ -11,9 +11,9 @@ agent Main {
 	rule +!main(list args) {
 		ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
 		/*best test of signalling strategy where headbot conducts performance review*/
-		ei.init([generation("20 s"), level("8")]);
+		//ei.init([generation("20 s"), level("8")]);
 		/*must clean dust here*/
-		//ei.init([generation("no"), level("4")]);
+		ei.init([generation("no"), level("8")]);
 		ei.join();
 		ei.startEnv();
 		list robots = ei.freeEntities();

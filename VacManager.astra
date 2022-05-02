@@ -425,27 +425,17 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ~fr
     }
 
     rule +!decide()  {
-		//c.println("3.3.1 BECAUSE NO OTHER DECISIONS we are in the hole DECIDE AGAIN");
+		c.println("3.3.1 BECAUSE NO OTHER DECISIONS we are in the hole ZAP");
 		//d.dumpBeliefs();
 		//ei.dumpState();
 		//c.println("3.3.2 wait 10 to decide");
 		s.sleep(1000);
-		!decide();
-		s.sleep(1000);
-		!houdini();
+		!zap();
 		
 		
     }
 
-  rule +!houdini()  {
-		//c.println("HOUDINI");
-		//d.dumpBeliefs();
-		//ei.dumpState();
-		//c.println("3.3.2 wait 10 to decide");
-		s.sleep(10000);
-		!houdini();
-		
-    }
+
 
 
 
