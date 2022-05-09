@@ -827,11 +827,12 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
 
 rule +!zap()  {
 		c.println("FATAL ERROR....unsuccessful reset exit in 10");
-		d.dumpBeliefs();
+			/*	d.dumpBeliefs();
 		ei.dumpState();
-		s.sleep(10000);
 		s.exit();
-	
+	*/
+	-+reset("yes");
+	!zap();	
     }
 
 
@@ -841,10 +842,11 @@ rule +!zap()  {
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & free(direction) {
 
 		//c.println("4.0 Move X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");			
-        ei.move(direction);
+        -+lastmove(A, B, d);
+		ei.move(direction);
 		s.sleep(100);
 		!dustturn();
-		-+lastmove(A, B, d);
+
 		
 		-+reset("no");
 
@@ -870,7 +872,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("no")  {
-		c.println("UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
+		//c.println("UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
 
 		s.sleep(1000);
 		!dustturn();

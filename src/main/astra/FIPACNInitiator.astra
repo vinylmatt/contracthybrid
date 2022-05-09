@@ -134,7 +134,7 @@ rule +$ei.event(task("move"))
             //c.println("Choice Report sent to " +name+ ".");
 
         }
-  
+        
     }
 
     rule @message(inform, string sender, otherchoicereport(long X, long Y,string d)) {
