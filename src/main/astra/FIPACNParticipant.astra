@@ -6,7 +6,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
     rule +deadendreport (long X, long Y, string d) {
-        c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
+        //c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
@@ -24,7 +24,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule @message(inform, string sender, deadendreport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
-        c.println("RX MSG that x" +X+" y" +Y+ " in dir " +d+" is a deadend. ");
+        //c.println("RX MSG that x" +X+" y" +Y+ " in dir " +d+" is a deadend. ");
 
     }
     

@@ -92,9 +92,11 @@ rule +$ei.event(task(string task))
 
 rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.task(string task)
     {
-       //c.println("DECISION DEBUG ONLY at x= "+ A +". y= "+ B +" direction "+ direction +". ");
+      //c.println("DECISION DEBUG ONLY at x= "+ A +". y= "+ B +" direction "+ direction +". ");
+	   /*d.dumpBeliefs();*/
 		!decide();
-		s.sleep(100);
+		s.sleep(10);
+	
     }
 
 rule +!performancereport() : messagecount(int tick) {
@@ -394,7 +396,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 /*wall following dectection*/
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
 
-		//c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
+		c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
 
 		-wall_status("following");
 		!move("right");
@@ -404,14 +406,14 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 		//c.println("E2x "+A+" y "+B+" d "+ d +" following a LH wall.");
 		
-		-+wall_status("following");
-		!wallcount();
+		/*-+wall_status("following");*/
+		/*!wallcount();*/
 		!move("forward");
     }
 
-rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d)  {
        
-		//c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
+		c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
 		!dustturn();
 		-wall_status("following");
 		!move("left");
@@ -422,8 +424,8 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 	
-		-+wall_status("following");
-		!wallcount();
+		/*-+wall_status("following");*/
+		/*!wallcount();*/
 		!move("forward");
 		//c.println("2.11.2 Moved forward in direction "+ d +" .");
 
@@ -434,7 +436,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E4x "+A+" y "+B+" d "+ d +" in open space ");
 	
-		!wallcount();
+		/*!wallcount();*/
 		!move("forward");
 
 

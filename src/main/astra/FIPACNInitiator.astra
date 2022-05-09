@@ -10,26 +10,6 @@ agent FIPACNInitiator extends FIPAContractNet {
         formula choicelocation(long, long, string);
     }
 
-/*this is to catch tasks that are not none or move*/
-rule +$ei.event(task(string task)) 
-    {
-
-		
-    }
-
-rule +$ei.event(task("none")) 
-    {
-		
-
-    }
-
-rule +$ei.event(task("move")) 
-    {
-		
-    }	
-
-
-
     // DELIBERATION RULES
     rule +contract(int id, string type, list params, int deadline) {
         !awarded(id, string loser);
@@ -100,10 +80,6 @@ rule +$ei.event(task("move"))
         !completed(id, false);
     }
 
-        /**
-     * dead end message
-     * can be overridden in subclasses...
-     */
 
     rule @message(inform, string sender, deadendreport(long X, long Y,string d)) {
         c.println("Report Recieved of a dead end entrance at." +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
@@ -118,10 +94,6 @@ rule +$ei.event(task("move"))
         }
          
     }
-
-            /**
-     * Choice message
-     */
 
     rule @message(inform, string sender, choicereport(long X, long Y,string d)) {
         //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
@@ -138,7 +110,7 @@ rule +$ei.event(task("move"))
     }
 
     rule @message(inform, string sender, otherchoicereport(long X, long Y,string d)) {
-        //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
+        c.println("OtherChoice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ " removing choicebelief.");
         
         -choicelocation(X, Y, d);
 

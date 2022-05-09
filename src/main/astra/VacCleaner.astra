@@ -397,8 +397,8 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 		//c.println("x "+A+" y "+B+" d "+ d +" following a LH wall. ");
 		!dustturn();
-		-+wall_status("following");
-		!wallcount();
+		/*-+wall_status("following");*/
+		/*!wallcount();*/
 		!move("forward");
     }
 
@@ -415,8 +415,8 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
-		-+wall_status("following");
-		!wallcount();
+		/*-+wall_status("following");*/
+		/*!wallcount();*/
 		!move("forward");
 		//c.println("2.11.2 Moved forward in direction "+ d +" .");
 
@@ -427,7 +427,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E4x "+A+" y "+B+" d "+ d +" in open space ?.");
 		!dustturn();
-		!wallcount();
+		/*!wallcount();*/
 		!move("forward");
 
 
