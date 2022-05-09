@@ -34,7 +34,7 @@ agent VacManager extends FIPACNInitiator {
 
     rule +!main(list args) {
 
-        //c.println("Enthusiastic Capitalist is: " + s.name());
+        c.println("Enthusiastic Capitalist is: " + s.name());
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
         ei.join();
         ei.link(s.name());
@@ -52,11 +52,42 @@ rule +!completed(int id, boolean outcome) {
     }
 
 
+rule +$ei.event(task("none")) : reset("yes")
+    {
+    //c.println("TASK where TASK NONE during RESET! Totally Stuck here ");
+	-+reset("no");
+	/*s.exit();	
+	!decide();*/
+
+	
+    }
+
+rule +$ei.event(task("none")) 
+    {
+    //c.println("REM ADVICE: TASK where TASK NONE DO NOTHING ");
+	
+		
+	//c.println("REM ADVICE: DECIDED TASK COMPLETE DO NOTHING");
+	
+    }
+
+rule +$ei.event(task("move")) 
+    {
+		//c.println("DEBUG move operation result");
+		//ei.dumpState();
+
+    }	
+
 rule +$ei.event(task("turn")) 
     {
        -+wallcount(0);
     }	
+/*this is to catch tasks that are not none or move*/
+rule +$ei.event(task(string task)) 
+    {
+     	//c.println(""+ task +"ing STARTS DO NOTHING");
 
+    }
 
 
 rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.task(string task)
@@ -75,7 +106,7 @@ rule +!performancereport() : messagecount(int tick) {
 		s.sleep(100);
     }
 /*Dust rules don't care about deadends, they push the move rules to mark them as open*/
-/* elavate because common*/
+
 rule +!decide() : ei.square("here", "dust") & ei.square("right", "dust") & ei.location(long A, long B) & ei.direction(string d) {
 		//c.println("D1-dust-here-Clean-move-Right  X "+A+" Y "+B+" facing "+d+".");
 		ei.light("on");
@@ -177,12 +208,13 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("left")  &
     }
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.location(long A, long B) & lastmove(long X, long Y, string d )  {
-		c.println("We are in a dusty deadend ");
+		//c.println("DEADEND1-D-dusthere-11 deadend ");
 		ei.light("on");
 	    !clean();
-		/*+location_status(X, Y, "deadend", d); */
-		c.println("we didn't mark at "+X+" y "+Y+" d "+d+" as being a waste of time because "+A+" y "+B+" had dust. If it were empty we might have treated it differently.");
+		-location_status(A, B, "deadend", d);
+		-location_status(X, Y, "deadend", d);
 		!move("back");
+
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100); 
     }
@@ -228,7 +260,7 @@ rule +!decide() : ei.square("forwardRight","dust") & ei.square("forwardLeft",  "
 
 	}
 
-//dust is plentyful for manager!
+
 rule +!decide() : ei.square("forward", "dust") & ei.square("left","dust") & ei.location(long A, long B) & ei.direction(string d)  {
 		//c.println("DF4L-dustforward-&left move left");
 		!performancereport();
@@ -267,7 +299,6 @@ rule +!decide() : ei.square("left", "dust") & ei.square("right", "dust") & ei.lo
 		ei.light("on");
 		!performancereport();
 		+location_status(A, B, "visited", d); 
-
 		!move("right"); 
 
     }
@@ -301,7 +332,8 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("fo
 	
 	{
    
-		c.println("DUSTFL11  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT GET A REPORT");
+		//c.println("DUSTFL11  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT GET A REPORT");
+		+location_status(A, B, "visited", d);
 		!performancereport();
 		!move("left");
 		
@@ -323,7 +355,6 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") {
 		//c.println("DUSTFL13  Move left to eat dust");
 		ei.light("on");
 		!move("left");
-
 
     }
 
@@ -364,8 +395,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
 
 		//c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
-		//add the signal for performance review here testing
-		//!performancereport(A,B);
+
 		-wall_status("following");
 		!move("right");
     }
@@ -381,9 +411,8 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		//c.println("DEBUG BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
-		/*d.dumpBeliefs();*/
-		/*!performancereport(A,B); is this wrecking it?  YES!*/
+		//c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
+		!dustturn();
 		-wall_status("following");
 		!move("left");
 
@@ -817,6 +846,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		
         -+reset("yes");
 		!decide(); 
+		-+reset("no");
 
     }
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
@@ -829,12 +859,11 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 rule +!move(string direction)   {
 		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
-
-		s.sleep(1000);// randomise so they restart at different times
-		-+reset("yes");
-		
+	
+		s.sleep(10);// randomise so they restart at different times
+		!decide();
 		s.sleep(10);
-
+		
 		!zap();
 		}
 
@@ -891,14 +920,7 @@ rule +!clean(string name)
    
 rule +!clean() 
     {
-		/*c.println("ERROR Dust appeared under us reset beliefs myself " );
-		
-		ei.clean();
-		
-		ei.light("off");
-		s.sleep(50);
-		s.sleep(75);
-		!zap();*/
+
 	
     }
 

@@ -6,16 +6,20 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
     rule +deadendreport (long X, long Y, string d) {
-        c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
+        //c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
 
     rule +choicereport (long X, long Y, string d) {
-        c.println("...TX " +X+" and " +Y+ " and " +d+" in a choice message to coordinator.");
+        //c.println("...TX " +X+" and " +Y+ " and " +d+" in a choice message to coordinator.");
         send(inform, "Henry", choicereport(X,Y,d));
     }
 
+    rule +otherchoicereport (long X, long Y, string d) {
+        //c.println("...TX " +X+" and " +Y+ " and " +d+" in a otherchoicereport message to coordinator.");
+        send(inform, "Henry", otherchoicereport(X,Y,d));
+    }
  
     rule @message(inform, string sender, deadendreport_echo(long X, long Y, string d)) {
         
@@ -28,7 +32,16 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule @message(inform, string sender, choicereport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
-        //c.println(".....RX x" +X+" y" +Y+ " and " +d+" choice message ");
+        //c.println(".....RX x" +X+" y" +Y+ " and " +d+" choicereport_echo message ");
+        !dustturn();!dustturn();!dustturn();!dustturn();!dustturn();!dustturn();
+ 
+
+    }
+
+    rule @message(inform, string sender, otherchoicereport_echo(long X, long Y, string d)) {
+        
+        -location_status(X, Y, "visited", d);
+        //c.println(".....RX x" +X+" y" +Y+ " and " +d+" otherchoicereport_echo message ");
         !dustturn();!dustturn();!dustturn();!dustturn();!dustturn();!dustturn();
  
 

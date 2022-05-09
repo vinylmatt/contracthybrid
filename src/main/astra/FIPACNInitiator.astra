@@ -126,12 +126,26 @@ rule +$ei.event(task("move"))
     rule @message(inform, string sender, choicereport(long X, long Y,string d)) {
         //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
         
-        -+choicelocation(X, Y, d);
+        +choicelocation(X, Y, d);
 
          foreach (participant(string name) ) {
 
             send(inform, name, choicereport_echo(X,Y, d));
             //c.println("Choice Report sent to " +name+ ".");
+
+        }
+  
+    }
+
+    rule @message(inform, string sender, otherchoicereport(long X, long Y,string d)) {
+        //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
+        
+        -choicelocation(X, Y, d);
+
+         foreach (participant(string name) ) {
+
+            send(inform, name, otherchoicereport_echo(X,Y, d));
+            //c.println("otherChoice Report sent to " +name+ ".");
 
         }
   

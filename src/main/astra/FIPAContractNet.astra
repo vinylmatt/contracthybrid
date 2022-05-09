@@ -9,8 +9,10 @@ agent FIPAContractNet {
 
         formula deadendreport(long, long, string);
         formula choicereport(long, long, string);
+        formula otherchoicereport(long, long, string);
         formula deadendreport_echo(long, long, string);
         formula choicereport_echo(long, long, string);
+        formula otherchoicereport_echo(long, long, string);
         formula location_status(long, long, string, string);
 
         formula wallcount(int);
