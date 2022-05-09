@@ -10,6 +10,26 @@ agent FIPACNInitiator extends FIPAContractNet {
         formula choicelocation(long, long, string);
     }
 
+/*this is to catch tasks that are not none or move*/
+rule +$ei.event(task(string task)) 
+    {
+
+		
+    }
+
+rule +$ei.event(task("none")) 
+    {
+		
+
+    }
+
+rule +$ei.event(task("move")) 
+    {
+		
+    }	
+
+
+
     // DELIBERATION RULES
     rule +contract(int id, string type, list params, int deadline) {
         !awarded(id, string loser);
@@ -105,7 +125,7 @@ agent FIPACNInitiator extends FIPAContractNet {
 
     rule @message(inform, string sender, choicereport(long X, long Y,string d)) {
         //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
-        !decide();
+
         -+choicelocation(X, Y, d);
 
          foreach (participant(string name) ) {

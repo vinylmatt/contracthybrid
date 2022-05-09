@@ -12,7 +12,7 @@ agent VacManager extends FIPACNInitiator {
 		formula location_status(long, long, string, string);
 		formula messagecount(int);
 		formula performancereport();
-		formula orient(int,int,string,string);	 }
+		 }
      
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac");
 	initial messagecount(0);
@@ -80,7 +80,7 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
     }
 
 /**signalling*/
-rule +!performancereport(int x, int y) : messagecount(int tick) {
+rule +!performancereport() : messagecount(int tick) {
 		int n = 1; 
 		n = tick + n;
 		c.println("Require performance report "+n+"  ");
@@ -223,7 +223,7 @@ rule +!decide() : ei.square("here", "dust") & ei.location(long A, long B) & ei.d
 
     rule +!decide() : ei.square("forward", "dust") & ei.square("left", "dust") & ei.location(long X, long Y) & ei.direction(string direction) {
 		//c.println("2.5.6l Move forward dust ahead. But we left dust to our left on the table SELL IT");			
-		!orient(X,Y,"left");
+		!performancereport();
 		ei.light("on");
 		!move("forward");
 		s.sleep(10);
@@ -234,7 +234,7 @@ rule +!decide() : ei.square("here", "dust") & ei.location(long A, long B) & ei.d
 
 	rule +!decide() : ei.square("forward", "dust") & ei.square("right", "dust") & ei.location(long X, long Y) & ei.direction(string direction) {
 		//c.println("2.5.6r Move forward dust ahead. But we left dust to our right on the table SELL IT ");
-		!orient( X, Y,"right");
+		!performancereport();
 		ei.light("on");
 		!move("forward"); 
 		s.sleep(10);
@@ -276,7 +276,7 @@ rule +!decide() : ei.square("here", "dust") & ei.location(long A, long B) & ei.d
 	rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("forwardRight","dust") & free("right") & ei.location(long X, long Y)  {
    
 		//c.println("2.8.1.1  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT SELL IT");
-		!orient(X, Y,"forwardRight");
+		!performancereport();
 		ei.light("on");
 		!move("left");
 		//c.println("2.8.1.2 Moved left DUST ON THE TABLE TO THE RIGHT");
@@ -285,7 +285,7 @@ rule +!decide() : ei.square("here", "dust") & ei.location(long A, long B) & ei.d
 	rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("forwardRight","dust") & ~free("right") & ei.location(long X, long Y) & ei.direction(string direction) {
    
 		//c.println("2.8.1.3  Move left to eat easy dust BUT WE SAW DUST we couldn't get so we SELL IT");
-		!orient(X,Y,"forwardRight");
+		!performancereport();
 		ei.light("on");
 		!move("left");
 		//c.println("2.8.2.4 Moved left to put dust to my right");
@@ -498,7 +498,7 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
     {
         //c.println("5.1 cleaning x "+A+" y "+B+" facing "+d+"and reset dust count." );
 		ei.clean();
-		!orient(A,B,d);
+		!performancereport();
 
 		/*lose all beliefs*/
 		-+location_status(A, B, "cleaned", d);
@@ -509,100 +509,6 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
 
   }
 
-/*take in observer location, square they're looking at and direction of
-observer, and output the square reference for the auction*/
-/*orient-manager only */
-rule +!orient(long X, long Y,string name) : ei.location(long A, long B) & ei.direction(string direction)  {
-        
-		//we will return A,B location
-		//c.println("2 OBSERVE NORTH square facing  location x = "+ X +" y= "+ Y +". ");			
-		
-		//c.println("3.1 Pointing "+direction+" x = "+ A +" y= "+ B +"  ");			
-
-		if (direction == "north") {
-
-
-			if (name == "left") 			{	A = A-1; 			!performancereport(A,B);	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-				}
-			if (name == "forwardLeft") 		{  A =A-1;	B =B-1;		!performancereport(A,B); 	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-				}
-			if (name == "forward") 			{  B =B-1;  			!performancereport(A,B); 	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-				}
-			if (name == "forwardRight") 	{  A= A+1; B= B-1;		!performancereport(A,B); 	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-				}
-			if (name == "right") 			{  A= A+1; 				!performancereport(A,B); 	
-				//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning....  .");			
-				}
-			
-  			}
-			
-	if (direction == "south") {
-
-				if (name == "left") {  				A = A+1; 			!performancereport(A,B);	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forwardLeft") 		{  	A= A+1; B= B+1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forward") 			{  B =B+1;  			!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forwardRight") 	{  A= A-1; B= B+1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "right") 			{  A= A-1; 				!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				
-			}
-
-
-	if (direction == "east") {		
-
-				if (name == "left") {  				B = B-1; 			!performancereport(A,B);	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning..... ");			
-					}
-				if (name == "forwardLeft") 		{  	A= A+1;B= B-1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forward") 			{  A= A+1;	 			!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forwardRight") 	{  A= A+1;	B= B+1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "right") 			{  B= B+1; 				!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");	
-						}
-				
-			}
-
-
-	if (direction == "west") {	
-
-				if (name == "left")				{  	B = B+1; 			!performancereport(A,B);	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forwardLeft") 		{  	A= A-1;	B= B+1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forward") 			{  A= A-1;				!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "forwardRight") 	{  A= A-1;	B= B-1;		!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");			
-					}
-				if (name == "right") 			{  B= B-1; 				!performancereport(A,B); 	
-					//c.println("Square "+ name +", at "+ A +" y= "+ B +" auctioning.... . ");
-						}
-			}
-
-
-	}
 
 
 
