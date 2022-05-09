@@ -17,19 +17,19 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
  
-    rule @message(inform, string sender, deadendreport(long X, long Y, string d)) {
+    rule @message(inform, string sender, deadendreport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
-        c.println(".....RX x" +X+" y" +Y+ " and " +d+" in a message about deadends. ");
+        //c.println(".....RX x" +X+" y" +Y+ " and " +d+" in a message about deadends. ");
 
     }
     
 
-    rule @message(inform, string sender, choicereport(long X, long Y, string d)) {
+    rule @message(inform, string sender, choicereport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
         //c.println(".....RX x" +X+" y" +Y+ " and " +d+" choice message ");
-        !dustturn();
+        !dustturn();!dustturn();!dustturn();!dustturn();!dustturn();!dustturn();
  
 
     }

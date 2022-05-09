@@ -712,7 +712,7 @@ rule +!decide() : ei.square("right", "empty") & ei.location(long A, long B) & ei
 
 rule +!decide() : ei.square("right",  "empty")  {
        
-		//c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
+		c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
 		!dustturn();
 		!move("right");
 		s.sleep(100);
@@ -721,21 +721,21 @@ rule +!decide() : ei.square("right",  "empty")  {
 /*Deadend detect rule below*//*Deadend rule below*/
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d ) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("DEADEND physically AT x "+A+" y "+B+".");
+		c.println("DEADEND physically AT x "+A+" y "+B+".");
 		!dustturn();
-		//c.println("DEADEND entrance  at x "+X+" y "+Y+" d "+d+" recorded for me");
+		c.println("DEADEND entrance  at x "+X+" y "+Y+" d "+d+" recorded for me");
 		+location_status(X, Y, "deadend", d); 
 
 		!move("back");
 		+deadendreport (X, Y, d);
-		//c.println("DEADEND Entrance recorded at "+X+" y "+Y+" d "+d+"...");
+		c.println("DEADEND Entrance recorded at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100);  
     }
 
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d )  {
        
-		//c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
+		c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
 		!dustturn();
 		!move("back");
 		//c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
@@ -750,7 +750,7 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
 /*get around unfree*/
 rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.location(long A, long B) & ei.direction(string d) {
        
-		//c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
+		c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
 		!dustturn();
         s.sleep(1000);
 		!move("back");
@@ -761,7 +761,7 @@ rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.locati
 
 rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction(string d) {
        
-		//c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better decide again.");
+		c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better decide again.");
 		!dustturn();
         s.sleep(1000);
 		!decide();
@@ -770,21 +770,20 @@ rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction
 /*get around unfree*/
 
 rule +!decide()  {
+		c.println(" Last decision rule, decide again");
        s.sleep(50);
 		!decide();
     }
 
-
-
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
-		//c.println("RESET Routine Initiated 1");
+		c.println("RESET Routine Initiated 1");
 
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
-		//c.println("TOTALLY RESET VISITED BELIEFS");
+		c.println("TOTALLY RESET VISITED BELIEFS");
 		-+nodust(0);
-		//c.println("ResetDust");
+		c.println("ResetDust");
 		s.sleep(1000);
 		-+reset("yes");
 		!zap();
@@ -792,52 +791,51 @@ rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no"
 }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
-		//c.println("RESET Routine 2 TRY MOVING IN the dir I'm pointing which is "+d+" .");
+		c.println("RESET Routine 2 TRY MOVING IN the dir I'm pointing which is "+d+" .");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move(d);
 		-+reset("no");
-		//c.println("RESET BELIEFS success moved in existing dir" +d+ ".");
+		c.println("RESET BELIEFS success moved in existing dir" +d+ ".");
 
     }
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
-		//c.println("RESET Routine 3 TRY LEFT");
+		c.println("RESET Routine 3 TRY LEFT");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move("left");
 		-+reset("no");
-		//c.println("RESET BELIEFS success moved left");
+		c.println("RESET BELIEFS success moved left");
 	
     }
 
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
-		//c.println("RESET Routine 4 try right");
+		c.println("RESET Routine 4 try right");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move("right");
 		-+reset("no");
-		//c.println("RESET BELIEFS success moved right");
-
+		c.println("RESET BELIEFS success moved right");
     }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		//c.println("RESET Routine 5 moving back");
+		c.println("RESET Routine 5 moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		!move("back");
 		-+reset("no");
-		//c.println("RESET BELIEFS success moved back");
+		c.println("RESET BELIEFS success moved back");
 		
 	
 	
     }
 
 rule +!zap()  {
-		//c.println("...........................................FATAL ERROR....unsuccessful reset exit in 10");
+		c.println("FATAL ERROR....unsuccessful reset exit in 10");
 		d.dumpBeliefs();
 		ei.dumpState();
 		s.sleep(10000);
@@ -858,9 +856,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		-+lastmove(A, B, d);
 		
 		-+reset("no");
-		//c.println("Removed reset belief mode X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");
-		/*???decide+location_s
-		tatus(A, B, "visited", d);*/
+
 	
     }
 
@@ -874,7 +870,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"vac") {
-		//c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
+		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
 			
 		s.sleep(3000);
 		!dustturn();
@@ -883,7 +879,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("no")  {
-		//c.println("UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
+		c.println("UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
 
 		s.sleep(1000);
 		!dustturn();
@@ -893,7 +889,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		//c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". was reset yesy so zap ");
+		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". was reset yesy so zap ");
 		s.sleep(1000);
 			
 		!dustturn();
@@ -905,7 +901,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		}
 
 rule +!move(string direction)   {
-		//c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
+		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 		!dustturn();
 		s.sleep(1000);// randomise so they restart at different times
 		!decide();

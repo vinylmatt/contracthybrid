@@ -107,13 +107,13 @@ rule +$ei.event(task("move"))
 
     rule @message(inform, string sender, deadendreport(long X, long Y,string d)) {
         c.println("Report Recieved of a dead end entrance at." +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
-        !decide();
+        
         -+deadendlocation(X, Y, d);
 
          foreach (participant(string name) ) {
 
-            send(inform, name, deadendreport(X,Y, d));
-            c.println("Deadend Report sent to " +name+ ".");
+            send(inform, name, deadendreport_echo(X,Y, d));
+            c.println("Deadend Report Rebroadcast to " +name+ ".");
 
         }
          
@@ -125,12 +125,12 @@ rule +$ei.event(task("move"))
 
     rule @message(inform, string sender, choicereport(long X, long Y,string d)) {
         //c.println("Choice Report Recieved" +X+" and " +Y+ "and " +d+" in a message from ." +sender+ ".");
-
+        
         -+choicelocation(X, Y, d);
 
          foreach (participant(string name) ) {
 
-            send(inform, name, choicereport(X,Y, d));
+            send(inform, name, choicereport_echo(X,Y, d));
             //c.println("Choice Report sent to " +name+ ".");
 
         }

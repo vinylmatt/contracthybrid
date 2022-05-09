@@ -13,7 +13,7 @@ agent Main {
 		/*best test of signalling strategy where headbot conducts performance review*/
 		ei.init([generation("20 s"), level("8")]);
 		/*must clean dust here*/
-		//ei.init([generation("no"), level("8")]);
+		//ei.init([generation("no"), level("3")]);
 		ei.join();
 		ei.startEnv();
 		list robots = ei.freeEntities();
