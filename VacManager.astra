@@ -453,7 +453,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 /*Robo rule move*/
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"obstacle") {
-		//c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was obstacle ");			
+		c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was obstacle ");			
 		s.sleep(3000);
 
 		!decide();
@@ -461,7 +461,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"vac") {
-		//c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was ..........................new VAC!!!!!!! ");			
+		c.println("BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when SQUARE"+d+" was ..........................new VAC!!!!!!! ");			
 		s.sleep(3000);
 
 		!decide();
@@ -469,7 +469,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". ");
+		c.println("4.2 Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". ");
 		s.sleep(1000);
 
 		!decide();
@@ -517,10 +517,10 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
 /*Robo rules clean*/
 rule +!clean(string name) : ~ei.square("here","dust")
     {
-        //c.println("ERROR ONLY 5.3 Drop Non Clean Square " + name +" ." );
+        c.println("ERROR ONLY 5.3 Drop Non Clean Square " + name +" ." );
 	
 	
-		s.sleep(5000);
+		s.sleep(75);
 		!decide();
 		
 		/*s.exit();*/
@@ -528,19 +528,19 @@ rule +!clean(string name) : ~ei.square("here","dust")
 
 rule +!clean(string name) 
     {
-        //c.println("ERROR ONLY 5.3 Can't clean here makes no sense in this square, decide again: " + name +" ." );
-		s.sleep(5000);
+        c.println("ERROR ONLY 5.3 Can't clean here makes no sense in this square, decide again: " + name +" ." );
+		s.sleep(75);
 		!decide();
 		/*s.exit();*/
     }
    
 rule +!clean() 
     {
-        //c.println("ERROR ONLY 5.4 Can't clean here makes no sense in this square: ." );
+        c.println("ERROR ONLY 5.4 Can't clean here makes no sense in this square: ." );
 		
 
 
-		s.sleep(5000);
+		s.sleep(75);
 		!decide();
 		/*s.exit();*/
     }

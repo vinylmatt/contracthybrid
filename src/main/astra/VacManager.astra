@@ -780,7 +780,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 		c.println("4.0 Move X "+A+" Y "+B+"  direction "+direction+" facing: "+d+".");			
         ei.move(direction);
-		s.sleep(100);
+		s.sleep(10);
 		!dustturn();
 		-+lastmove(A, B, d);
 		-+reset("no");
@@ -882,7 +882,7 @@ rule +!clean(string name)
 		
 		
 	
-		s.sleep(5000);
+		s.sleep(75);
 		!zap();
 		/*s.exit();*/
     }
@@ -895,7 +895,7 @@ rule +!clean()
 		
 		ei.light("off");
 		s.sleep(50);
-		s.sleep(5000);
+		s.sleep(75);
 		!zap();*/
 	
     }

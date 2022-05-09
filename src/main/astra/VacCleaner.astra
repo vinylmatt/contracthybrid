@@ -975,7 +975,7 @@ rule +!clean(string name)
 		
 		!dustturn();
 	
-		s.sleep(5000);
+		s.sleep(75);
 		!zap();
 		/*s.exit();*/
     }
@@ -990,7 +990,7 @@ rule +!clean()
 		s.sleep(50);
 		
 
-		s.sleep(5000);
+		s.sleep(75);
 		!zap();*/
 	
     }
