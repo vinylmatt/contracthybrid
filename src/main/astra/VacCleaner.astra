@@ -385,9 +385,9 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & f
 		+otherchoicereport (A, B, d);
     }
 /*wall following dectection*/
-rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "right")  {
+rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("left", "obstacle") & free("right") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ~location_status(A, B, "deadend", "d")  {
 
-		//c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
+		c.println("BREAK FREE FROM WALL at "+A+" y "+B+" d "+ d +" following a LH wall by going RIGHT.");
 		!dustturn();
 		-wall_status("following");
 		!move("right");
@@ -397,14 +397,14 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 		//c.println("x "+A+" y "+B+" d "+ d +" following a LH wall. ");
 		!dustturn();
-		/*-+wall_status("following");*/
-		/*!wallcount();*/
+		-+wall_status("following");
+		!wallcount();
 		!move("forward");
     }
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & ei.square("right", "obstacle") & free("left") & ei.location(long A, long B) & ei.direction(string d) & wallcount(3) & ei.square("right", "obstacle") & ~location_status(A, B, "deadend", d) {
        
-		//c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
+		c.println("BREAK FREE FROM WALL FOLLOWING E2x "+A+" y "+B+" d "+ d +" following a RH wall by going LEFT.");
 		!dustturn();
 		-wall_status("following");
 		!move("left");
@@ -415,8 +415,8 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E3x "+A+" y "+B+" d "+ d +" FOLLOWING a RH wall .");
 		!dustturn();
-		/*-+wall_status("following");*/
-		/*!wallcount();*/
+		-+wall_status("following");
+		!wallcount();
 		!move("forward");
 		//c.println("2.11.2 Moved forward in direction "+ d +" .");
 
@@ -427,7 +427,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
        
 		//c.println("E4x "+A+" y "+B+" d "+ d +" in open space ?.");
 		!dustturn();
-		/*!wallcount();*/
+		!wallcount();
 		!move("forward");
 
 
@@ -894,7 +894,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 rule +!move(string direction)   {
 		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 		!dustturn();
-		s.sleep(1000);// randomise so they restart at different times
+		s.sleep(1000);
 		!decide();
 		s.sleep(1000);
 		!dustturn();

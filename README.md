@@ -24,3 +24,6 @@ testing techniques - dense logging and speeded up footage
 taking out conflicting error states where trying to make routes and make the agents manager and cleaner's interactions to break loops.
 
 general purpose strategy tested against random confugrations, many times.
+
+with messaging running, it's looking like no wall follow detection is best for large maps when no regen
+with regen on, wallfollowing detector in the workers. 
