@@ -11,7 +11,7 @@ agent FIPACNInitiator extends FIPAContractNet {
     }
 
     // DELIBERATION RULES
-    rule +review(int id, string type, list params, int deadline) {
+    rule +contract(int id, string type, list params, int deadline) {
         !awarded(id, string loser);
     }
 
@@ -20,9 +20,9 @@ agent FIPACNInitiator extends FIPAContractNet {
         loser = awardee;
     }
 
-    rule +!awarded(int id, string loser) : review(id, string type, list params, int deadline) {
+    rule +!awarded(int id, string loser) : contract(id, string type, list params, int deadline) {
         foreach(participant(string participant)) {
-            send(cfp, participant, review(id, type, params, deadline));
+            send(cfp, participant, contract(id, type, params, deadline));
         }
 
         // Wait till deadline for status_reports...
@@ -55,14 +55,14 @@ agent FIPACNInitiator extends FIPAContractNet {
      * can be overridden in subclasses...
      */
     rule +!worst_performance(int id, string employee, int value) : 
-            worst_performance(id, string worst_performer, int dust_value) {
-        if (value > dust_value) {
+            worst_performance(id, string worst_performer, int best_value) {
+        if (value > best_value) {
             -+worst_performance(id, employee, value);
         }
     }
 
     rule +!worst_performance(int id, string employee, int value) : 
-            review(id, string type, list params, int deadline) {
+            contract(id, string type, list params, int deadline) {
         +worst_performance(id, employee, value);
     }
 
@@ -70,12 +70,12 @@ agent FIPACNInitiator extends FIPAContractNet {
         +status_report(id, sender, value);
     }
 
-    rule @message(inform, string sender, failed(int id, string type, list params)) {
+    rule @message(inform, string sender, fulfilled(int id, string type, list params)) {
         !completed(id, true);
     }
 
 
-    rule @message(failure, string sender, review(int id, string type, list params, int deadline)) {
+    rule @message(failure, string sender, contract(int id, string type, list params, int deadline)) {
         !completed(id, false);
     }
 
@@ -109,7 +109,8 @@ agent FIPACNInitiator extends FIPAContractNet {
     }
 
     rule @message(inform, string sender, abundancereport(long X, long Y,string d)) {
-        c.println("Abundance Report Received " +X+" and " +Y+ " and " +d+" in a message from " +sender+ ".");  
+        c.println("Abundance Report Received " +X+" and " +Y+ " and " +d+" in a message from " +sender+ ".");
+           
        !performancereport();
     
     }
@@ -140,19 +141,19 @@ agent FIPACNInitiator extends FIPAContractNet {
 
     // Optional: Removal of all code (including this belief)
     rule +completed(int id, boolean outcome) : 
-            review(id, string type, list params, int deadline) &
+            contract(id, string type, list params, int deadline) &
              worst_performance(id, string sender, int value) {
          -completed(id, outcome);
         -awarded(id, sender);
         -worst_performance(id, sender, value);
-        -review(id, type, params, deadline);
+        -contract(id, type, params, deadline);
 
     }
 
     rule @message(inform, string sender, choicereport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
-        //c.println("Manager listens in on choicereport_echo at " +X+" y" +Y+ " and " +d+" choicereport_echo message ");
+        c.println("Manager listens in on own choicereport_echo at " +X+" y" +Y+ " and " +d+" choicereport_echo message ");
      
 
     }
@@ -160,7 +161,7 @@ agent FIPACNInitiator extends FIPAContractNet {
     rule @message(inform, string sender, otherchoicereport_echo(long X, long Y, string d)) {
         
         -location_status(X, Y, "visited", d);
-        //c.println("Manager listens in on otherchoicereport_echo at  x" +X+" y" +Y+ " and " +d+" otherchoicereport_echo message ");
+        c.println("Manager listens in on own otherchoicereport_echo at  x" +X+" y" +Y+ " and " +d+" otherchoicereport_echo message ");
 
  
 

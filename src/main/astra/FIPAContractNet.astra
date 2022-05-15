@@ -3,9 +3,9 @@ agent FIPAContractNet {
     module Console c;
 
     types cnp_shared {
-        formula review(int, string, list, int);
+        formula contract(int, string, list, int);
         formula status_report(int, string, int);
-        formula failed(int, string, list);
+        formula fulfilled(int, string, list);
 
         formula deadendreport(long, long, string);
         formula choicereport(long, long, string);
