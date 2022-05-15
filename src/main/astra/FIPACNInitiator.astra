@@ -153,7 +153,7 @@ agent FIPACNInitiator extends FIPAContractNet {
     rule @message(inform, string sender, choicereport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "visited", d);
-        c.println("Manager listens in on own choicereport_echo at " +X+" y" +Y+ " and " +d+" choicereport_echo message ");
+        //c.println("Manager listens in on choicereport_echo at " +X+" y" +Y+ " and " +d+" choicereport_echo message ");
      
 
     }
@@ -161,7 +161,7 @@ agent FIPACNInitiator extends FIPAContractNet {
     rule @message(inform, string sender, otherchoicereport_echo(long X, long Y, string d)) {
         
         -location_status(X, Y, "visited", d);
-        c.println("Manager listens in on own otherchoicereport_echo at  x" +X+" y" +Y+ " and " +d+" otherchoicereport_echo message ");
+        //c.println("Manager listens in on otherchoicereport_echo at  x" +X+" y" +Y+ " and " +d+" otherchoicereport_echo message ");
 
  
 

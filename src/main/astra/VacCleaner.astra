@@ -246,7 +246,7 @@ rule +!decide() : ei.square("forward", "dust") & ei.square("forwardLeft",  "dust
 	}
 
 rule +!decide() : ei.square("forwardRight","dust") & ei.square("forwardLeft",  "dust") & free("forward")   {
-		//c.println("DF4dustforward-03 2x Lots of dust ahead so drive into the gap. do I ever run?");
+		//c.println("DF4dustforward-03 2x Lots of dust ahead so drive into the gap.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);
