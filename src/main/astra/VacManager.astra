@@ -95,8 +95,9 @@ rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.
 
 rule +!performancereport() : messagecount(int tick) & ei.location(long A, long B) & ei.direction(string D) & lastperfloc(A,B,D) {
 		c.println("Can't send a performance review notice from where I was last time. Better decide on a move before I ask for report");
+		s.sleep(100);
 		!decide();
-		s.sleep(1000);
+		s.sleep(100);		
 		!performancereport();
     }
 

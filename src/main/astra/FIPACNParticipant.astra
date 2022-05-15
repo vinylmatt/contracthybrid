@@ -58,12 +58,12 @@ agent FIPACNParticipant extends FIPAContractNet {
         +contract(id, type, params, deadline);
 
         try {
-            c.println("!status_report running");
+            //c.println("status_report running");
             !status_report(id, string name, int score);
 
             send(propose, sender, status_report(id, name, score));
         } recover {
-            c.println("refusnik error message I never run");
+
             send(refuse, sender, contract(id, type, params, deadline));
         }
     }
@@ -81,12 +81,12 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
     rule @message(reject-proposal, string sender, status_report(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
-        c.println("Rejected Proposal");
+        //c.println("Rejected Proposal");
         +rejected(id, sender);
     }
 
     rule +!status_report(int id, string name, int score) {
-        c.println("Generating status report");
+        //c.println("Generating status report");
         !generate_status_report(id, int my_score);
 
         
