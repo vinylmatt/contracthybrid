@@ -53,9 +53,9 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
  
-    rule @message(cfp, string sender, contract(int id, string type, list params, int deadline)) {
+    rule @message(cfp, string sender, review(int id, string type, list params, int deadline)) {
         
-        +contract(id, type, params, deadline);
+        +review(id, type, params, deadline);
 
 
             //c.println("!status_report running");
@@ -64,16 +64,16 @@ agent FIPACNParticipant extends FIPAContractNet {
 
     }
 
-    rule @message(accept-proposal, string sender, status_report(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
+    rule @message(accept-proposal, string sender, status_report(int id, system.name(), int score)) : review(id, string type, list params, int deadline) {
         +failed(id, sender);
 
-            c.println("I run when reset command failed");
-            !fulfil(id, type, params);
-            send(inform, sender, fulfilled(id, type, params));
+            c.println("I failed my review");
+            !fail(id, type, params);
+            send(inform, sender, failed(id, type, params));
        
     }
 
-    rule @message(reject-proposal, string sender, status_report(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
+    rule @message(reject-proposal, string sender, status_report(int id, system.name(), int score)) : review(id, string type, list params, int deadline) {
         c.println("Passed Review");
         +passed(id, sender);
     }
