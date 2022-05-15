@@ -6,7 +6,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     }
 
     rule +deadendreport (long X, long Y, string d) {
-        //c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
+        c.println("...TX " +X+" and " +Y+ " and " +d+" in a deadend message to coordinator.");
         send(inform, "Henry", deadendreport(X,Y,d));
     }
 
@@ -14,6 +14,11 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule +choicereport (long X, long Y, string d) {
         //c.println("...TX " +X+" and " +Y+ " and " +d+" in a choice message to coordinator.");
         send(inform, "Henry", choicereport(X,Y,d));
+    }
+
+    rule +abundancereport (long X, long Y, string d) {
+        c.println("...TX " +X+" and " +Y+ " and " +d+" in a abundancereport message to coordinator.");
+        send(inform, "Henry", abundancereport(X,Y,d));
     }
 
     rule +otherchoicereport (long X, long Y, string d) {
@@ -24,7 +29,7 @@ agent FIPACNParticipant extends FIPAContractNet {
     rule @message(inform, string sender, deadendreport_echo(long X, long Y, string d)) {
         
         +location_status(X, Y, "deadend", d);
-        //c.println("RX MSG that x" +X+" y" +Y+ " in dir " +d+" is a deadend. ");
+        c.println("RX MSG that x" +X+" y" +Y+ " in dir " +d+" is a deadend. ");
 
     }
     
@@ -34,7 +39,7 @@ agent FIPACNParticipant extends FIPAContractNet {
         +location_status(X, Y, "visited", d);
         //c.println(".....RX x" +X+" y" +Y+ " and " +d+" choicereport_echo message ");
         !dustturn();!dustturn();!dustturn();!dustturn();!dustturn();!dustturn();
- 
+        //there's a cost!
 
     }
 
@@ -53,41 +58,50 @@ agent FIPACNParticipant extends FIPAContractNet {
         +contract(id, type, params, deadline);
 
         try {
-            !bid(id, string name, int score);
+            c.println("!status_report running");
+            !status_report(id, string name, int score);
 
-            send(propose, sender, bid(id, name, score));
+            send(propose, sender, status_report(id, name, score));
         } recover {
+            c.println("refusnik error message I never run");
             send(refuse, sender, contract(id, type, params, deadline));
         }
     }
 
-    rule @message(accept-proposal, string sender, bid(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
+    rule @message(accept-proposal, string sender, status_report(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
         +accepted(id, sender);
         try {
+            c.println("I run when reset command accepted");
             !fulfil(id, type, params);
             send(inform, sender, fulfilled(id, type, params));
         } recover {
+            c.println("I never run");
             send(failure, sender, contract(id, type, params, deadline));
         }
     }
 
-    rule @message(reject-proposal, string sender, bid(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
+    rule @message(reject-proposal, string sender, status_report(int id, system.name(), int score)) : contract(id, string type, list params, int deadline) {
+        c.println("Rejected Proposal");
         +rejected(id, sender);
     }
 
-    rule +!bid(int id, string name, int score) {
-        !generate_bid(id, int my_score);
+    rule +!status_report(int id, string name, int score) {
+        c.println("Generating status report");
+        !generate_status_report(id, int my_score);
+
         
         name = system.name();
         score = my_score;
-        +bid(id, name, score);
+        +status_report(id, name, score);
     }
     
-    rule +!generate_bid(int id, int score) : contract(id, string type, list params, int deadline) {
+    rule +!generate_status_report(int id, int score) : contract(id, string type, list params, int deadline) {
+        c.println("I never run generate status fail");
         system.fail();
     }
 
     rule +!fulfil(int id, string type, list params) {
+        c.println("I never run1 fulfil");
         system.fail();
     }
 

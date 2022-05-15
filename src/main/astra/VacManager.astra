@@ -9,10 +9,9 @@ agent VacManager extends FIPACNInitiator {
         formula vac(string);
 		formula move(string, int );
 		formula free(string);
-		
+		formula lastperfloc(long, long, string);
 		formula lastmove(long, long, string);
 		formula wall_status(string);
-		
 		formula reset(string);
 		formula binarychoice(string, string);
 		formula fullchoice(string, string, string);
@@ -25,6 +24,7 @@ agent VacManager extends FIPACNInitiator {
 
 	initial reset("no");
 
+
 	inference free(string X) :- ~ei.square(X, "obstacle") & ~ei.square(X, "vac") ;
 	//necessary to reduce number sof rules to bring within limits
 	inference binarychoice(string X, string Y) :- free(X) & free(Y) ;
@@ -34,12 +34,11 @@ agent VacManager extends FIPACNInitiator {
 
     rule +!main(list args) {
 
-        c.println("Enthusiastic Capitalist is: " + s.name());
+        c.println("Active Manager is: " + s.name());
         ei.launch("vw","dependency/vacuumworld-1.2.0.jar");
         ei.join();
         ei.link(s.name());
        forall(string arg : args) {
-            //c.println("Add Participant in Manager." + arg + " . ");
             +participant(arg);
         }
 		s.sleep(3000);
@@ -47,33 +46,29 @@ agent VacManager extends FIPACNInitiator {
     }
 
 rule +!completed(int id, boolean outcome) {
-        //c.println(".............................................Contact: " + id + " / Outcome: " + outcome);
+
         FIPACNInitiator::!completed(id, outcome);
     }
 
 
 rule +$ei.event(task("none")) : reset("yes")
     {
-    //c.println("TASK where TASK NONE during RESET! Totally Stuck here ");
+    //c.println(".TASK where TASK NONE during RESET!  ");
 	-+reset("no");
-	/*s.exit();	
-	!decide();*/
+
 
 	
     }
 
 rule +$ei.event(task("none")) 
     {
-    //c.println("REM ADVICE: TASK where TASK NONE DO NOTHING ");
-	
-		
-	//c.println("REM ADVICE: DECIDED TASK COMPLETE DO NOTHING");
+
 	
     }
 
 rule +$ei.event(task("move")) 
     {
-		//c.println("DEBUG move operation result");
+		//c.println(".DEBUG move operation result");
 		//ei.dumpState();
 
     }	
@@ -82,27 +77,35 @@ rule +$ei.event(task("turn"))
     {
        -+wallcount(0);
     }	
-/*this is to catch tasks that are not none or move*/
+
 rule +$ei.event(task(string task)) 
     {
-     	//c.println(""+ task +"ing STARTS DO NOTHING");
+     	//c.println("."+ task +"ing STARTS DO NOTHING");
 
     }
 
 
-rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.task(string task)
+rule +$ei.event(location(long A, long B)) : ei.direction(string direction) & ei.task(string task) 
     {
-      //c.println("DECISION DEBUG ONLY at x= "+ A +". y= "+ B +" direction "+ direction +". ");
-	   /*d.dumpBeliefs();*/
+		//c.println("DECISION DEBUG ONLY at x= "+ A +". y= "+ B +" direction "+ direction +". ");
 		!decide();
 		s.sleep(10);
 	
     }
 
-rule +!performancereport() : messagecount(int tick) {
+rule +!performancereport() : messagecount(int tick) & ei.location(long A, long B) & ei.direction(string D) & lastperfloc(A,B,D) {
+		c.println("Can't send a performance review notice from where I was last time. Better decide on a move before I ask for report");
+		!decide();
+		s.sleep(1000);
+		!performancereport();
+    }
+
+rule +!performancereport() : messagecount(int tick) & ei.location(long A, long B) & ei.direction(string D) {
+		c.println("Perf report debug current location "+ A +". y= "+ B +" "+ D +".");
+		+lastperfloc(A,B,D);
 		int n = 1; 
 		n = tick + n;
-		//c.println("I'm seeing too much dust around here and I'm not happy, we're going to have our "+n+"th performance review  ");
+		c.println("Too much dust and I'm not happy, we're going to have our "+n+"th performance review  ");
 		-+messagecount(n);
 		+contract(n, "performancereview", [], 10000); 
 		s.sleep(100);
@@ -110,14 +113,14 @@ rule +!performancereport() : messagecount(int tick) {
 /*Dust rules don't care about deadends, they push the move rules to mark them as open*/
 
 rule +!decide() : ei.square("here", "dust") & ei.square("right", "dust") & ei.location(long A, long B) & ei.direction(string d) {
-		//c.println("D1-dust-here-Clean-move-Right  X "+A+" Y "+B+" facing "+d+".");
+		//c.println(".D1-dust-here-Clean-move-Right  X "+A+" Y "+B+" facing "+d+".");
 		ei.light("on");
 	    !clean();
 		!move("right");
     }
 
 rule +!decide() : ei.square("here", "dust") & ei.square("left", "dust") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D2-D-dusthere-Clean-Left  X "+A+" Y "+B+" facing "+d+".");
+		//c.println(".D2-D-dusthere-Clean-Left  X "+A+" Y "+B+" facing "+d+".");
 		ei.light("on");
 	    !clean();
 		!move("left");
@@ -126,14 +129,14 @@ rule +!decide() : ei.square("here", "dust") & ei.square("left", "dust") & ei.loc
 
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "dust") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D3-dust-here-dust-ahead X "+A+" Y "+B+" facing "+d+" with plan to move forward because is free.");
+		//c.println(".D3-dust-here-dust-ahead X "+A+" Y "+B+" facing "+d+" with plan to move forward because is free.");
 		ei.light("on");
 	    !clean();
 		!move("forward");
     }
 
 rule +!decide() : ei.square("here", "dust") & free("forward") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D4-dust-here-empty-forward.");
+		//c.println(".D4-dust-here-empty-forward.");
 		ei.light("on");
 	    !clean();
 		ei.light("off");
@@ -144,7 +147,7 @@ rule +!decide() : ei.square("here", "dust") & free("forward") & ei.location(long
 
 /*remember lie of land in here*/
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("frontLeft", "obstacle") & ei.square("frontRight", "obstacle") & free("right") & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D5-dust-here-wall ahead.CHOICE RECORDED LR : R");
+		//c.println(".D5-dust-here-wall ahead.CHOICE RECORDED LR : R");
 		ei.light("on");
 	    !clean();
 		!move("right");
@@ -153,7 +156,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") &
     }
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("forwardRight", "dust") & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D6-dusthere-5 Choice of paths-rightdust is there");
+		//c.println(".D6-dusthere-5 Choice of paths-rightdust is there");
 		ei.light("on");
 	    !clean();
 		!move("right");
@@ -161,7 +164,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") &
     }
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "vac") & ei.square("forwardRight", "dust") & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D6-dustherevac in the way we go right because the dust is there");
+		//c.println(".D6-dustherevac in the way we go right because the dust is there");
 		ei.light("on");
 	    !clean();
 		!move("right");
@@ -169,7 +172,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "vac") & ei.s
 
 /*remember lie of land in here*/
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("forwardLeft", "dust")  & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D8 D-dusthere-6 Choice of paths around this block but we go left because the dust is there");
+		//c.println(".D8 D-dusthere-6 Choice of paths around this block but we go left because the dust is there");
 		ei.light("on");
 	    !clean();
 		!move("left");
@@ -178,7 +181,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") &
 
 /*remember lie of land in here*/
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "vac") & ei.square("forwardLeft", "dust")  & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D8 D-dusthere-6 Choice of paths around this vac but we go left because the dust is there");
+		//c.println(".D8 D-dusthere-6 Choice of paths around this vac but we go left because the dust is there");
 		ei.light("on");
 	    !clean();
 		!move("left");
@@ -187,7 +190,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "vac") & ei.s
 
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & free("right") & free("left") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D9-D-dusthere-7 Choice of paths around this block or wall, we're going right but there is a choice ");
+		//c.println(".D9-D-dusthere-7 Choice of paths around this block or wall, we're going right but there is a choice ");
 		ei.light("on");
 	    !clean();
 		!move("right");
@@ -195,7 +198,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") &
     }
 
 rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("right") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D10-D-dusthere- DECIDE RULE Clean HERE exit right ");
+		//c.println(".D10-D-dusthere- DECIDE RULE Clean HERE exit right ");
 		ei.light("on");
 	    !clean();
 		!move("right");
@@ -203,14 +206,14 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("right") &
 
 
 rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("left")  & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D11-D-dusthere-10 DECIDE RULE Clean HERE NO WAY FREE IN FRONT exit left ");
+		//c.println(".D11-D-dusthere-10 DECIDE RULE Clean HERE NO WAY FREE IN FRONT exit left ");
 		ei.light("on");
 	    !clean();
 		!move("left");
     }
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.location(long A, long B) & lastmove(long X, long Y, string d )  {
-		//c.println("DEADEND1-D-dusthere-11 deadend ");
+		//c.println(".DEADEND1-D-dusthere-11 deadend ");
 		ei.light("on");
 	    !clean();
 		-location_status(A, B, "deadend", d);
@@ -222,7 +225,7 @@ rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") &
     }
 
 rule +!decide() : ei.square("here", "dust") & ~free("forward") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("D12-D-dusthere-11 RULE Clean HERE NO WAY FREE IN FRONT, could be other vac ");
+		//c.println(".D12-D-dusthere-11 RULE Clean HERE NO WAY FREE IN FRONT, could be other vac ");
 		ei.light("on");
 	    !clean();
 		!move("back");
@@ -231,21 +234,21 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & ei.location(lon
 
 /*near dust rules - move forward*/
 rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust") & ei.square("forwardleft", "dust") {
-		//c.println("DF1-dustforward-01 Lots of dust ahead all three moving forward. CHOICE OF DUST TO BROADCAST!!!!!.");
+		//c.println(".DF1-dustforward-01 Lots of dust ahead all three moving forward. CHOICE OF DUST TO BROADCAST!!!!!.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);		
     }
 
 rule +!decide() : ei.square("forward", "dust") & ei.square("forwardRight", "dust")  {
-		//c.println("DF2-dustforward-02 2x Lots of dust ahead and right forward.");
+		//c.println(".DF2-dustforward-02 2x Lots of dust ahead and right forward.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);
 	}
 
 rule +!decide() : ei.square("forward", "dust") & ei.square("forwardLeft",  "dust")  {
-		//c.println("DF3-dustforward-03 2x Lots of dust ahead and left forward.");
+		//c.println(".DF3-dustforward-03 2x Lots of dust ahead and left forward.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);
@@ -254,7 +257,7 @@ rule +!decide() : ei.square("forward", "dust") & ei.square("forwardLeft",  "dust
 	}
 
 rule +!decide() : ei.square("forwardRight","dust") & ei.square("forwardLeft",  "dust") & free("forward")   {
-		//c.println("DF4dustforward-03 2x Lots of dust ahead so drive into the gap. do I ever run?");
+		//c.println(".DF4dustforward-03 2x Lots of dust ahead so drive into the gap. do I ever run?");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);
@@ -264,7 +267,7 @@ rule +!decide() : ei.square("forwardRight","dust") & ei.square("forwardLeft",  "
 
 
 rule +!decide() : ei.square("forward", "dust") & ei.square("left","dust") & ei.location(long A, long B) & ei.direction(string d)  {
-		//c.println("DF4L-dustforward-&left move left");
+		//c.println(".DF4L-dustforward-&left move left");
 		!performancereport();
 		ei.light("on");
 		+location_status(A, B, "visited", d);
@@ -307,7 +310,7 @@ rule +!decide() : ei.square("left", "dust") & ei.square("right", "dust") & ei.lo
 
 
 rule +!decide() : ei.square("forward", "dust") {
-		//c.println("DF8-Move forward dust ahead.");
+		//c.println(".DF8-Move forward dust ahead.");
 		ei.light("on");
 		!move("forward");
 		s.sleep(100);
@@ -315,7 +318,7 @@ rule +!decide() : ei.square("forward", "dust") {
     }
 
 rule +!decide() : ei.square("left", "dust") {
-		//c.println("DL9 Move left because dust.");
+		//c.println(".DL9 Move left because dust.");
 		ei.light("on");
 		!move("left");
 		s.sleep(100);
@@ -324,7 +327,7 @@ rule +!decide() : ei.square("left", "dust") {
 
 rule +!decide() : ei.square("right", "dust") {
    
-		//c.println("DL10 DECIDE Move right for dust.");
+		//c.println(".DL10 DECIDE Move right for dust.");
 		ei.light("on");
 		!move("right");
 		s.sleep(100);
@@ -334,7 +337,7 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("fo
 	
 	{
    
-		//c.println("DUSTFL11  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT GET A REPORT");
+		//c.println(".DUSTFL11  Move left to eat dust BUT WE LEFT DUST ON THE TABLE TO THE RIGHT GET A REPORT");
 		+location_status(A, B, "visited", d);
 		!performancereport();
 		!move("left");
@@ -343,10 +346,10 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("fo
 
 	rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("forwardRight","dust") & ~free("right") {
    
-		//c.println("DUSTFL12  Move left to eat easy dust BUT WE SAW DUST we couldn't get to! Sell this in the other agent");
+		//c.println(".DUSTFL12  Move left to eat easy dust BUT WE SAW DUST we couldn't get to! Sell this in the other agent");
 		ei.light("on");
 		!move("left");
-		//c.println("2.8.2.2 Moved left BUT WE SAW DUST we couldn't get to right. We could have sold it.");
+		//c.println(".2.8.2.2 Moved left BUT WE SAW DUST we couldn't get to right. We could have sold it.");
     }
 
 
@@ -354,7 +357,7 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") & ei.square("fo
 
 rule +!decide() : ei.square("forwardLeft","dust") & free("left") {
    
-		//c.println("DUSTFL13  Move left to eat dust");
+		//c.println(".DUSTFL13  Move left to eat dust");
 		ei.light("on");
 		!move("left");
 
@@ -362,7 +365,7 @@ rule +!decide() : ei.square("forwardLeft","dust") & free("left") {
 
 rule +!decide() :  ei.square("forwardRight","dust")  & free("right") {
  
-		//c.println("DUSTFL14 Move right to eat dust.");
+		//c.println(".DUSTFL14 Move right to eat dust.");
 		ei.light("on");
 		!move("right");
     }
@@ -370,7 +373,7 @@ rule +!decide() :  ei.square("forwardRight","dust")  & free("right") {
 /*default forward rule*/
 rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("DC1.1 DEFAULT FORWARD "+ d +". OPEN ROAD *** DEFAULT FORWARD *** at x "+A+" y "+B+" .");
+		//c.println(".DC1.1 DEFAULT FORWARD "+ d +". OPEN ROAD *** DEFAULT FORWARD *** at x "+A+" y "+B+" .");
 		
 		!move("forward");
 		+location_status(A, B, "visited", d);
@@ -378,7 +381,7 @@ rule +!decide() : fullchoice(string X, string Y, string Z) & free("forwardLeft")
 
 rule +!decide() : ei.square("forward", "empty") & free("right") & free("left") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("DC1.2"+ d +". OPEN ROAD *** ALT RIGHT *** at x "+A+" y "+B+" .");
+		//c.println(".DC1.2"+ d +". OPEN ROAD *** ALT RIGHT *** at x "+A+" y "+B+" .");
 		
 		-location_status(A, B, "visited", d);
 		!move("right");
@@ -387,7 +390,7 @@ rule +!decide() : ei.square("forward", "empty") & free("right") & free("left") &
 
 rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & free("right") & free("left") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B)  & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E1x "+A+" y "+B+" D-FORK empty here & front direction "+ d +". OPEN ROAD going              *** ALT RIGHT ***  at x "+A+" y "+B+" .");
+		//c.println(".E1x "+A+" y "+B+" D-FORK empty here & front direction "+ d +". OPEN ROAD going              *** ALT RIGHT ***  at x "+A+" y "+B+" .");
 		!dustturn();
 		
 		!move("right");
@@ -417,7 +420,7 @@ rule +!decide() : ei.square("here", "empty") & ei.square("forward", "empty") & e
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E5x "+A+" y "+B+" d "+ d +" FORK IN THE ROAD, going *** DEFAULT LEFT ***.");
+		//c.println(".E5x "+A+" y "+B+" d "+ d +" FORK IN THE ROAD, going *** DEFAULT LEFT ***.");
 		
 		+location_status(A, B, "visited", d);
 		!move("left");
@@ -426,7 +429,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & free("forwardLeft") & free("forwardRight") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E6x "+A+" y "+B+" d "+ d +" FORK IN THE ROAD, going *** ALT RIGHT ***.");
+		//c.println(".E6x "+A+" y "+B+" d "+ d +" FORK IN THE ROAD, going *** ALT RIGHT ***.");
 		
 		!move("right");
 		-location_status(A, B, "visited", d);
@@ -437,7 +440,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d)& ~location_status(A, B, "deadend", d) {
        
-		//c.println("E7x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".E7x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -446,7 +449,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & fre
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E8x "+A+" y "+B+" d "+ d +" *** ALT LEFT *** .");
+		//c.println(".E8x "+A+" y "+B+" d "+ d +" *** ALT LEFT *** .");
 		
 		!move("left");
 		-location_status(A, B, "visited", d);
@@ -455,7 +458,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & fre
 
 rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E9x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".E9x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -464,7 +467,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 
 rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E10x "+A+" y "+B+" d "+ d +" *** ALT RIGHT *** .");
+		//c.println(".E10x "+A+" y "+B+" d "+ d +" *** ALT RIGHT *** .");
 		
 		!move("right");
 		-location_status(A, B, "visited", d);
@@ -473,7 +476,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 
 rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E11x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".E11x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -482,7 +485,7 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 
 rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E12x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
+		//c.println(".E12x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
 		
 		!move("left");
 
@@ -493,7 +496,7 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 
 rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E13x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".E13x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -502,7 +505,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 
 rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E14x "+A+" y "+B+" d "+ d +" *** ALT RIGHT *** .");
+		//c.println(".E14x "+A+" y "+B+" d "+ d +" *** ALT RIGHT *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("right");
@@ -513,7 +516,7 @@ rule +!decide() : ei.square("right", "empty") & free("forward") & ei.location(lo
 
 rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E15 x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".E15 x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 	
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -522,7 +525,7 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 
 rule +!decide() : free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("just plain old forwARD x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
+		//c.println(".just plain old forwARD x "+A+" y "+B+" d "+ d +" *** DEFAULT FORWARD *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("forward");
@@ -534,7 +537,7 @@ rule +!decide() : free("forward") & ei.location(long A, long B) & ei.direction(s
 
 rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E16 DEADEND x "+A+" y "+B+" d "+ d +" *** ALT left *** .");
+		//c.println(".E16 DEADEND x "+A+" y "+B+" d "+ d +" *** ALT left *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("left");
@@ -543,7 +546,7 @@ rule +!decide() : ei.square("left", "empty") & free("forward") & ei.location(lon
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.square("forwardLeft", "obstacle") & ei.square("forwardRight", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E17 "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT RIGHT *** .");
+		//c.println(".E17 "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT RIGHT *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("right");
@@ -552,7 +555,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.square("forwardLeft", "obstacle") & ei.square("forwardRight", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E18 "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT LEFT *** .");
+		//c.println(".E18 "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT LEFT *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("left");
@@ -562,7 +565,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
+		//c.println(".E19 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT RIGHT *** .");
 		
 		//mark we have
 		+location_status(A, B, "visited", d);
@@ -573,7 +576,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E20x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
+		//c.println(".E20x "+A+" y "+B+" d "+ d +" *** FORK ALT LEFT *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("left");
@@ -583,7 +586,7 @@ rule +!decide() : ei.square("left", "empty") & ei.square("right", "empty") & ei.
 
 rule +!decide() : ei.square("left", "empty") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("E21 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT LEFT *** .");
+		//c.println(".E21 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT LEFT *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("left");
@@ -592,7 +595,7 @@ rule +!decide() : ei.square("left", "empty") & ei.location(long A, long B) & ei.
 
 rule +!decide() : ei.square("left",  "empty")  {
        
-		c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move left because empty. No dead end protection");
+		//c.println(".ERROR SHOULDNT RUN NO LOCATION DATA Move left because empty. No dead end protection");
 		
 		!move("left");
 		s.sleep(100);
@@ -601,7 +604,7 @@ rule +!decide() : ei.square("left",  "empty")  {
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.square("forwardRight", "obstacle") & ei.square("forwardLeft", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d){
        
-		c.println("e22 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT left *** .");
+		//c.println(".e22 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL DEFAULT left *** .");
 		
 		+location_status(A, B, "visited", d);
 		!move("left");
@@ -610,7 +613,7 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.square("forwardRight", "obstacle") & ei.square("forwardLeft", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d){
        
-		c.println("e23 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT right *** .");
+		//c.println(".e23 x "+A+" y "+B+" d "+ d +" *** CLEAN WALL ALT right *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("right");
@@ -620,7 +623,7 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d){
        
-		c.println("e24 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT left *** .");
+		//c.println(".e24 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT left *** .");
 	
 		+location_status(A, B, "visited", d);
 
@@ -630,7 +633,7 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		c.println("e25 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT right *** .");
+		//c.println(".e25 x "+A+" y "+B+" d "+ d +" *** FORK DEFAULT right *** .");
 		
 		-location_status(A, B, "visited", d);
 
@@ -640,7 +643,7 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 
 rule +!decide() : ei.square("right", "empty") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "deadend", d) {
        
-		//c.println("e26 x "+A+" y "+B+" d "+ d +" *** FORK ALT right *** .");
+		//c.println(".e26 x "+A+" y "+B+" d "+ d +" *** FORK ALT right *** .");
 		
 		-location_status(A, B, "visited", d);
 		!move("right");
@@ -649,7 +652,7 @@ rule +!decide() : ei.square("right", "empty") & ei.location(long A, long B) & ei
 
 rule +!decide() : ei.square("right",  "empty")  {
        
-		c.println("ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
+		//c.println(".ERROR SHOULDNT RUN NO LOCATION DATA Move right because empty. No dead end protection");
 		
 		!move("right");
 		s.sleep(100);
@@ -657,23 +660,23 @@ rule +!decide() : ei.square("right",  "empty")  {
 
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d ) & ei.direction(d) & ~location_status(A, B, "deadend", d) {
        
-		c.println("DEADEND AT x "+A+" y "+B+".");
+		//c.println(".DEADEND AT x "+A+" y "+B+".");
 		
-		c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
+		//c.println(".DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
 		+location_status(X, Y, "deadend", d); 
 		!move("back");
 
-		c.println("entrace to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
+		//c.println(".entrace to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100);  
     }
 
 rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.square("forward", "obstacle") & lastmove( long X, long Y, string d )  {
        
-		c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
+		//c.println(".DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
 
 		!move("back");
-		c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
+		//c.println(".DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
 		+location_status(X, Y, "deadend", d); 
 
 		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
@@ -683,10 +686,10 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
 
 rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.location(long A, long B) & ei.direction(string d) {
        
-		c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
+		//c.println(".x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
         s.sleep(10);
 		!move("back");
-		c.println("Moved Back, decide again");
+		//c.println(".Moved Back, decide again");
 		s.sleep(10);   
 		!decide(); 
     }
@@ -694,7 +697,7 @@ rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.locati
 
 rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction(string d) {
        
-		c.println("x "+A+" y "+B+" d "+ d +" We're near complete outta options, decide again");
+		//c.println(".x "+A+" y "+B+" d "+ d +" We're near complete outta options, decide again");
 		
 		!dustturn();
         s.sleep(10);
@@ -704,20 +707,20 @@ rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction
 /*get around unfree*/
 
 rule +!decide()  {
-	c.println(" Last decision rule, decide again");
+	c.println(".Last decision rule, discarded");
        s.sleep(50);
-	   !decide();
+	   /*!decide();*/
     }
 
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
-		c.println("RESET Routine Initiated 1");
+		//c.println(".RESET Routine Initiated 1");
 
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
 	    -location_status(A, B, "visited", d);
-		c.println("TOTALLY RESET VISITED BELIEFS");
+		//c.println(".TOTALLY RESET VISITED BELIEFS");
 	
-		c.println("ResetDust");
+		//c.println(".ResetDust");
 		s.sleep(1000);
 		-+reset("yes");
 		!zap();
@@ -725,51 +728,51 @@ rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no"
 }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
-		c.println("RESET Routine 2 TRY MOVING IN the dir I'm pointing which is "+d+" .");
+		//c.println(".RESET Routine 2 TRY MOVING IN the dir I'm pointing which is "+d+" .");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move(d);
 		-+reset("no");
-		c.println("RESET BELIEFS success moved in existing dir" +d+ ".");
+		//c.println(".RESET BELIEFS success moved in existing dir" +d+ ".");
 
     }
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
-		c.println("RESET Routine 3 TRY LEFT");
+		//c.println(".RESET Routine 3 TRY LEFT");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move("left");
 		-+reset("no");
-		c.println("RESET BELIEFS success moved left");
+		//c.println(".RESET BELIEFS success moved left");
 	
     }
 
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
-		c.println("RESET Routine 4 try right");
+		//c.println(".RESET Routine 4 try right");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
 		!move("right");
 		-+reset("no");
-		c.println("RESET BELIEFS success moved right");
+		//c.println(".RESET BELIEFS success moved right");
     }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		c.println("RESET Routine 5 moving back");
+		//c.println(".RESET Routine 5 moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		!move("back");
 		-+reset("no");
-		c.println("RESET BELIEFS success moved back");
+		//c.println(".RESET BELIEFS success moved back");
 		
 	
 	
     }
 	
 rule +!zap()  {
-		c.println("FATAL ERROR....unsuccessful reset exit in 10");
+		//c.println(".FATAL ERROR....unsuccessful reset exit in 10");
 	/*	d.dumpBeliefs();
 		ei.dumpState();
 		s.exit();
@@ -795,7 +798,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"obstacle") {
-		c.println("Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" BY OBSTACLE check prior instruction for mis-percept");	
+		//c.println(".Move BLOCKED from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+" BY OBSTACLE check prior instruction for mis-percept");	
 
 		s.sleep(1000);
 		
@@ -804,7 +807,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"vac") {
-		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
+		//c.println(".Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
 			
 		s.sleep(3000);
 		
@@ -815,7 +818,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("no")  {
-		//c.println("UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
+		//c.println(".UNEXPECTED BLOCK from X "+A+" Y "+B+" in direction "+direction+" when facing."+d+".");	
 
 		s.sleep(1000);
 		
@@ -825,7 +828,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
     }
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". While in Reset mode ");
+		//c.println(".Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". While in Reset mode ");
 		s.sleep(1000);
 		-+reset("no");
 		!zap();
@@ -833,7 +836,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		}
 
 rule +!move(string direction)   {
-		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
+		//c.println(".ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 	
 		s.sleep(10);
 		!decide();/*try removing this decide*/
@@ -846,7 +849,7 @@ rule +!move(string direction)   {
 
 rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.direction(string d)
     {
-        //c.println("Cleaning x "+A+" y "+B+" facing "+d+"." );
+        //c.println(".Cleaning x "+A+" y "+B+" facing "+d+"." );
 		ei.clean();
 		
 		-+wallcount(0);
@@ -857,7 +860,7 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
 
 rule +!clean(string name) : ei.square("here","dust") & ei.location(long A, long B) & ei.direction(string d) 
     {
-        c.println("5.1b cleaning x "+A+" y "+B+" facing "+d+"." );
+        c.println(".5.1b cleaning x "+A+" y "+B+" facing "+d+"." );
 		ei.clean();
 		
 		-+wallcount(0);
@@ -867,7 +870,7 @@ rule +!clean(string name) : ei.square("here","dust") & ei.location(long A, long 
 
 rule +!clean(string name) : ei.square("here","dust") 
     {
-        c.println("cleaning I shouldn't run but I do anyway" );
+        c.println(".cleaning I shouldn't run but I do anyway" );
 		ei.clean();
 		
 		-+wallcount(0);
@@ -877,14 +880,14 @@ rule +!clean(string name) : ei.square("here","dust")
 
 rule +!clean(string name) : ~ei.square("here","dust")
     {
-        c.println("No dust to clean forget it" );
+        c.println(".No dust to clean forget it" );
 		ei.light("off");
 		s.sleep(50);
     }
 
 rule +!clean(string name) 
     {
-		c.println("ERROR 5.3 Can't clean here makes no sense in this square, zap from square: " + name +" ." );
+		//c.println(".ERROR 5.3 Can't clean here makes no sense in this square, zap from square: " + name +" ." );
 		
 		
 	
