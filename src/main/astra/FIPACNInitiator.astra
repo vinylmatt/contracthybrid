@@ -4,11 +4,14 @@ agent FIPACNInitiator extends FIPAContractNet {
     types cnp_initiator {
         formula participant(string);
         formula awarded(int, string);
+        formula perflock(string);
         formula worst_performance(int, string, int);
         formula completed(int, boolean);
         formula deadendlocation(long, long, string);
         formula choicelocation(long, long, string);
     }
+
+    initial perflock("off");
 
     // DELIBERATION RULES
     rule +contract(int id, string type, list params, int deadline) {
@@ -48,6 +51,7 @@ agent FIPACNInitiator extends FIPAContractNet {
         +awarded(id, worst_performer);
         c.println("Performance review is done for the "+id+"th time. "+worst_performer+" is this round's lazy dirtbag.");
         loser = worst_performer;
+        -+perflock("off");
     }
 
     /**
@@ -108,10 +112,19 @@ agent FIPACNInitiator extends FIPAContractNet {
     
     }
 
+    rule @message(inform, string sender, abundancereport(long X, long Y,string d)) : perflock("on") {
+        c.println("Abundance Report Received " +X+" and " +Y+ " and " +d+" in a message from " +sender+ " and ignored.");
+           
+ 
+    
+    }
+
     rule @message(inform, string sender, abundancereport(long X, long Y,string d)) {
         //c.println("Abundance Report Received " +X+" and " +Y+ " and " +d+" in a message from " +sender+ ".");
-           
+
+       -+perflock("on");    
        !performancereport();
+       
     
     }
 
@@ -129,17 +142,11 @@ agent FIPACNInitiator extends FIPAContractNet {
   
     }
 
-
-
-    /**
-     * Default behaviour is to adopt the corresponding belief which causes the agent to clear all beliefs
-     * This rule can be overriden to introduce more complex handling of failure
-     */
      rule +!completed(int id, boolean outcome) {
          +completed(id, outcome);
      }
 
-    // Optional: Removal of all code (including this belief)
+
     rule +completed(int id, boolean outcome) : 
             contract(id, string type, list params, int deadline) &
              worst_performance(id, string sender, int value) {

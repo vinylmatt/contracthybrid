@@ -1,3 +1,4 @@
+/*CNP Based on example code */
 agent FIPAContractNet {
     module System system;
     module Console c;
@@ -6,7 +7,6 @@ agent FIPAContractNet {
         formula contract(int, string, list, int);
         formula status_report(int, string, int);
         formula fulfilled(int, string, list);
-
         formula deadendreport(long, long, string);
         formula choicereport(long, long, string);
         formula otherchoicereport(long, long, string);

@@ -46,12 +46,7 @@ agent VacCleaner extends FIPACNParticipant {
 	
     }
 
-    rule +!fulfil(string id, "performancereview", []) {
-		c.println("I really sucked in manager's "+id+"th round of performance reviews! Going for reeducation...");
-		/*d.dumpBeliefs();*/
-		!zap();
-		c.println("Reeducation complete.");
-    }
+
 
 
 rule +$ei.event(task("none")) : reset("yes")
@@ -200,6 +195,14 @@ rule +!decide() : ei.square("here", "dust") & ~free("forward") & free("left")  &
 	    !clean();
 		!move("left");
     } 
+	/*dust to each side fix*/
+rule +!decide() : ei.square("here", "dust") & ~free("forward")  & ei.location(long A, long B) & ei.direction(string d)  {
+		//c.println("dust under and facing wall");
+		ei.light("on");
+	    !clean();
+		!move("back");
+    }
+/*dust to each side fix*/
 
 rule +!decide() : ei.square("here", "dust") & ei.square("forward", "obstacle") & ei.square("left", "obstacle") & ei.square("right", "obstacle") & ei.location(long A, long B) & lastmove(long X, long Y, string d )  {
 		//c.println("DEADEND1-D-dusthere-11 deadend ");
@@ -666,10 +669,6 @@ rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.
 		s.sleep(100);  
 
     }
-
-
-
-
 
 rule +!decide() : ei.square("right", "empty") & ei.square("left", "empty") & ei.square("forward", "obstacle") & ei.location(long A, long B) & ei.direction(string d) & ~location_status(A, B, "visited", d) & ~location_status(A, B, "deadend", d){
        
