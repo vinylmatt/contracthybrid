@@ -50,7 +50,7 @@ agent VacCleaner extends FIPACNParticipant {
 		c.println("I really sucked in manager's "+id+"th round of performance reviews! Going for reeducation...");
 		/*d.dumpBeliefs();*/
 		!zap();
-		c.println("Reeducation complete That was refreshing.");
+		c.println("Reeducation complete.");
     }
 
 
@@ -715,13 +715,12 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
        
 		c.println("DEADEND physically AT x "+A+" y "+B+".");
 		!dustturn();
-		c.println("DEADEND entrance  at x "+X+" y "+Y+" d "+d+" recorded for me");
+		c.println("DEADEND entrance  at x "+X+" y "+Y+" d "+d+" recorded");
 		+location_status(X, Y, "deadend", d); 
-
 		!move("back");
 		+deadendreport (X, Y, d);
 		c.println("DEADEND Entrance recorded at "+X+" y "+Y+" d "+d+"...");
-		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
+		//we leave here pointing in other direction so we are able to use the square, just not in that direction.
 		s.sleep(100);  
     }
 
@@ -730,10 +729,7 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
 		c.println("DEADEND AT x "+A+" y "+B+" ERROR SHOULD NOT RUN.");
 		!dustturn();
 		!move("back");
-		//c.println("DEADEND recording at x "+X+" y "+Y+" d "+d+"...");
 		+location_status(X, Y, "deadend", d); 
-		//c.println("entrance to DEADEND recorded at "+X+" y "+Y+" d "+d+"...");
-		//we should leave here pointing in other direction so we should still be able to use the square just not in that direction.
 		s.sleep(100);  
 
     }
@@ -742,7 +738,7 @@ rule +!decide() : ei.location(long A, long B) & ei.square("left", "obstacle") & 
 /*get around unfree*/
 rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.location(long A, long B) & ei.direction(string d) {
        
-		c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
+		//c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better go back.");
 		!dustturn();
         s.sleep(1000);
 		!move("back");
@@ -753,7 +749,7 @@ rule +!decide() :  ~free("forward") & ~free("left") & ~free("right") & ei.locati
 
 rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction(string d) {
        
-		c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better decide again.");
+		//c.println("x "+A+" y "+B+" d "+ d +" Going Nowhere better decide again.");
 		!dustturn();
         s.sleep(1000);
 		!decide();
@@ -762,14 +758,13 @@ rule +!decide() :  ~free("forward") & ei.location(long A, long B) & ei.direction
 /*get around unfree*/
 
 rule +!decide()  {
-		c.println(" Last decision rule, decide again OR ZAP");
-       s.sleep(50);
-		/*!decide();*/
+		c.println("Last decision rule do reset");
+		s.sleep(50);
 		!zap();
     }
 
 rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no") {
-		c.println("RESET Routine Initiated 1");
+		c.println("RESET Routine Initiated");
 
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		-+location_status(A, B, "visited", d);
@@ -783,7 +778,7 @@ rule +!zap() : ei.location(long A, long B) & ei.direction(string d) & reset("no"
 }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) & reset("yes") {
-		c.println("RESET Routine 2 TRY MOVING IN the dir I'm pointing which is "+d+" .");
+		c.println("RESET Routine 1 TRY MOVING IN the dir I'm pointing which is "+d+" .");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
@@ -793,7 +788,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free(d) &
 
     }
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("left") & reset("yes") {
-		c.println("RESET Routine 3 TRY LEFT");
+		c.println("RESET Routine 2 TRY LEFT");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
@@ -805,7 +800,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("lef
 
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("right") & reset("yes") {
-		c.println("RESET Routine 4 try right");
+		c.println("RESET Routine 3 try right");
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		
 		s.sleep(1000);
@@ -815,7 +810,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & free("rig
     }
 
 rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		c.println("RESET Routine 5 moving back");
+		c.println("RESET Routine 4 moving back");
 		
 		s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");s.sleep(100);ei.light("off");s.sleep(100);ei.light("on");
 		!move("back");
@@ -827,11 +822,7 @@ rule +!zap() :  ei.location(long A, long B) & ei.direction(string d) & reset("ye
     }
 
 rule +!zap()  {
-		c.println("Zapping didn't complete trying again");
-			/*	d.dumpBeliefs();
-		ei.dumpState();
-		s.exit();
-	*/
+	c.println("Zapping didn't complete trying again");
 	-+reset("yes");
 	!zap();	
     }
@@ -864,7 +855,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & ei.square(d,"vac") {
-		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
+		//c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". BY A BOT!!!!!!! ");	
 			
 		s.sleep(3000);
 		!dustturn();
@@ -883,7 +874,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
     }
 
 rule +!move(string direction) : ei.location(long A, long B) & ei.direction(string d) & reset("yes") {
-		c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". was reset yes so zap ");
+		//c.println("Move BLOCKED from X "+A+" Y "+B+"  in direction "+direction+" when facing."+d+". reset yes so zap ");
 		s.sleep(1000);	
 		!dustturn();
 		-+reset("no");
@@ -893,7 +884,7 @@ rule +!move(string direction) : ei.location(long A, long B) & ei.direction(strin
 		}
 
 rule +!move(string direction)   {
-		c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
+		//c.println("ERROR Move BLOCKED in direction "+direction+" with no location or direction info! THis shouldn't happen. Ask Rem");
 		!dustturn();
 		s.sleep(1000);
 		!decide();
@@ -928,7 +919,6 @@ rule +!clean() : ei.square("here","dust") & ei.location(long A, long B) & ei.dir
 
     }
 	
-
 
 rule +!clean(string name) : ei.square("here","dust") & ei.location(long A, long B) & ei.direction(string d) 
     {
@@ -965,15 +955,10 @@ rule +!clean(string name)
 	
 		s.sleep(75);
 		!zap();
-		/*s.exit();*/
+
     }
    
-rule +!clean() 
-    {
-
-
-	
-    }
+rule +!clean()  {    }
    
 
 
